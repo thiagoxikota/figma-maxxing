@@ -81,12 +81,10 @@ O instalador copia pastas e mais nada. Ele se recusa a sobrescrever uma skill qu
 
 Com a configuração de [O que você precisa](#o-que-você-precisa) pronta, diga ao agente, do seu jeito, o que precisa fazer. Sem essa configuração, use o texto de [Cole na sua IA](#cole-na-sua-ia).
 
-| A tarefa | Diga algo como | O que roda |
-|---|---|---|
-| Aplicar o feedback que deixaram no arquivo | "Corrige o que comentaram nessa página" | `figma-comment-fix-loop` lê os comentários abertos, corrige cada um no frame onde o pino está e te entrega a evidência |
-| Conferir uma tela antes de dizer que está pronta | "Essa tela tá pronta?" | `figma-slop-check` procura sinais de geração automática e falhas de precisão; depois `figma-handoff-gate` confere o que o dev precisa |
-| Criar ou editar sem quebrar o arquivo | "Adiciona um estado vazio nessa tela" | `figma-preflight` confirma o alvo, os tokens e os componentes que já existem antes de escrever um nó |
-| Entender um arquivo que você acabou de abrir | Cole a URL do Figma | `figma-orient` mapeia páginas, componentes e variáveis e guarda o mapa para a próxima vez |
+- **Aplicar o feedback que deixaram no arquivo.** Diga: "Corrige o que comentaram nessa página". O `figma-comment-fix-loop` lê os comentários abertos, corrige cada um no frame onde o pino está e te entrega a evidência.
+- **Conferir uma tela antes de dizer que está pronta.** Diga: "Essa tela tá pronta?" O `figma-slop-check` procura sinais de geração automática e falhas de precisão; depois `figma-handoff-gate` confere o que o dev precisa.
+- **Criar ou editar sem quebrar o arquivo.** Diga: "Adiciona um estado vazio nessa tela". O `figma-preflight` confirma o alvo, os tokens e os componentes que já existem antes de escrever um nó.
+- **Entender um arquivo que você acabou de abrir.** Cole a URL do Figma. O `figma-orient` mapeia páginas, componentes e variáveis e guarda o mapa para a próxima vez.
 
 ## O que dá errado e o que evita
 
@@ -110,16 +108,14 @@ O `figma-bridge-doctor` cuida da conexão entre o agente e o Figma Desktop. Ele 
 
 ## As skills
 
-| Skill | Quando roda | O que faz |
-|---|---|---|
-| [`figma-canon`](../skills/figma-canon/SKILL.md) | Sempre que o assunto é Figma | A base de conhecimento: regras da Plugin API, gotchas, auto layout, nomes, cobertura de estados, formato de handoff. Carrega só o pedaço que a tarefa pede |
-| [`figma-preflight`](../skills/figma-preflight/SKILL.md) | Antes de toda edição | Conferência que não edita nada. Libera a edição ou devolve a lista do que falta. Também audita fluxo: tela órfã e botão que não leva a lugar nenhum |
-| [`figma-orient`](../skills/figma-orient/SKILL.md) | Primeiro contato com um arquivo | Monta o mapa do arquivo e salva no seu projeto |
-| [`figma-slop-check`](../skills/figma-slop-check/SKILL.md) | Depois de editar | Pega design com cara de máquina e design impreciso |
-| [`figma-handoff-gate`](../skills/figma-handoff-gate/SKILL.md) | Antes do handoff | Ação completa, qualidade da anotação, prova na escala certa, arquivo sem rastro do processo |
-| [`figma-comment-fix-loop`](../skills/figma-comment-fix-loop/SKILL.md) | Quando chega feedback | Do comentário à correção, com evidência |
-| [`figma-click-flow`](../skills/figma-click-flow/SKILL.md) | "Vira isso em fluxo" | Desenha as setas do elemento clicável até a tela de destino |
-| [`figma-bridge-doctor`](../skills/figma-bridge-doctor/SKILL.md) | Problema de conexão | Diagnostica e recupera a conexão da Desktop Bridge (macOS) |
+- **[`figma-canon`](../skills/figma-canon/SKILL.md)** · Sempre que o assunto é Figma. A base de conhecimento: regras da Plugin API, gotchas, auto layout, nomes, cobertura de estados, formato de handoff. Carrega só o pedaço que a tarefa pede.
+- **[`figma-preflight`](../skills/figma-preflight/SKILL.md)** · Antes de toda edição. Conferência que não edita nada. Libera a edição ou devolve a lista do que falta. Também audita fluxo: tela órfã e botão que não leva a lugar nenhum.
+- **[`figma-orient`](../skills/figma-orient/SKILL.md)** · Primeiro contato com um arquivo. Monta o mapa do arquivo e salva no seu projeto.
+- **[`figma-slop-check`](../skills/figma-slop-check/SKILL.md)** · Depois de editar. Pega design com cara de máquina e design impreciso.
+- **[`figma-handoff-gate`](../skills/figma-handoff-gate/SKILL.md)** · Antes do handoff. Ação completa, qualidade da anotação, prova na escala certa, arquivo sem rastro do processo.
+- **[`figma-comment-fix-loop`](../skills/figma-comment-fix-loop/SKILL.md)** · Quando chega feedback. Do comentário à correção, com evidência.
+- **[`figma-click-flow`](../skills/figma-click-flow/SKILL.md)** · "Vira isso em fluxo". Desenha as setas do elemento clicável até a tela de destino.
+- **[`figma-bridge-doctor`](../skills/figma-bridge-doctor/SKILL.md)** · Problema de conexão. Diagnostica e recupera a conexão da Desktop Bridge (macOS).
 
 ## Alguns dos gotchas
 

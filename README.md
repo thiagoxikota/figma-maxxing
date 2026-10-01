@@ -90,12 +90,10 @@ The installer copies folders and nothing else. It refuses to overwrite a skill t
 
 Once the setup in [What you need](#what-you-need) is in place, say the job in your own words. Without that setup, use the text in [Paste this into your AI](#paste-this-into-your-ai).
 
-| The job | Say something like | What runs |
-|---|---|---|
-| Apply the feedback people left in the file | "Fix what they commented on this page" | `figma-comment-fix-loop` reads the open comments, fixes each one on the frame where it was pinned and hands you the evidence |
-| Check a screen before you call it done | "Is this frame ready?" | `figma-slop-check` looks for machine-made tells and precision defects, then `figma-handoff-gate` checks what a developer needs |
-| Build or edit without breaking the file | "Add an empty state to this screen" | `figma-preflight` confirms the target, the tokens and the existing components before a single node is written |
-| Understand a file you just opened | Paste the Figma URL | `figma-orient` maps pages, components and variables and saves the map for next time |
+- **Apply the feedback people left in the file.** Say: "Fix what they commented on this page". `figma-comment-fix-loop` reads the open comments, fixes each one on the frame where it was pinned and hands you the evidence.
+- **Check a screen before you call it done.** Say: "Is this frame ready?" `figma-slop-check` looks for machine-made tells and precision defects, then `figma-handoff-gate` checks what a developer needs.
+- **Build or edit without breaking the file.** Say: "Add an empty state to this screen". `figma-preflight` confirms the target, the tokens and the existing components before a single node is written.
+- **Understand a file you just opened.** Paste the Figma URL. `figma-orient` maps pages, components and variables and saves the map for next time.
 
 ## What goes wrong, and what catches it
 
@@ -119,16 +117,14 @@ A developer builds what is drawn and guesses the rest. `figma-handoff-gate` list
 
 ## The skills
 
-| Skill | When it runs | What it does |
-|---|---|---|
-| [`figma-canon`](skills/figma-canon/SKILL.md) | Any time Figma comes up | The knowledge base: Plugin API rules, gotchas, auto layout, naming, state coverage, handoff format. Loaded piece by piece, only what the task needs |
-| [`figma-preflight`](skills/figma-preflight/SKILL.md) | Before every write | Read-only gate. Approves the write or returns a fix list. Also audits flows for orphan screens and buttons that lead nowhere |
-| [`figma-orient`](skills/figma-orient/SKILL.md) | First contact with a file | Builds the map of the file and saves it in your project |
-| [`figma-slop-check`](skills/figma-slop-check/SKILL.md) | After a write | Catches design that looks machine made and design that is imprecise |
-| [`figma-handoff-gate`](skills/figma-handoff-gate/SKILL.md) | Before a handoff | Action completeness, annotation quality, proof at the right scale, no trace of the process |
-| [`figma-comment-fix-loop`](skills/figma-comment-fix-loop/SKILL.md) | When feedback arrives | Comments to fixes to evidence |
-| [`figma-click-flow`](skills/figma-click-flow/SKILL.md) | "Turn this into a flow" | Draws flow arrows from tappable elements to their destination screens |
-| [`figma-bridge-doctor`](skills/figma-bridge-doctor/SKILL.md) | Connection problems | Diagnoses and repairs the Desktop Bridge connection (macOS) |
+- **[`figma-canon`](skills/figma-canon/SKILL.md)** · Any time Figma comes up. The knowledge base: Plugin API rules, gotchas, auto layout, naming, state coverage, handoff format. Loaded piece by piece, only what the task needs.
+- **[`figma-preflight`](skills/figma-preflight/SKILL.md)** · Before every write. Read-only gate. Approves the write or returns a fix list. Also audits flows for orphan screens and buttons that lead nowhere.
+- **[`figma-orient`](skills/figma-orient/SKILL.md)** · First contact with a file. Builds the map of the file and saves it in your project.
+- **[`figma-slop-check`](skills/figma-slop-check/SKILL.md)** · After a write. Catches design that looks machine made and design that is imprecise.
+- **[`figma-handoff-gate`](skills/figma-handoff-gate/SKILL.md)** · Before a handoff. Action completeness, annotation quality, proof at the right scale, no trace of the process.
+- **[`figma-comment-fix-loop`](skills/figma-comment-fix-loop/SKILL.md)** · When feedback arrives. Comments to fixes to evidence.
+- **[`figma-click-flow`](skills/figma-click-flow/SKILL.md)** · "Turn this into a flow". Draws flow arrows from tappable elements to their destination screens.
+- **[`figma-bridge-doctor`](skills/figma-bridge-doctor/SKILL.md)** · Connection problems. Diagnoses and repairs the Desktop Bridge connection (macOS).
 
 ## A few of the gotchas
 
