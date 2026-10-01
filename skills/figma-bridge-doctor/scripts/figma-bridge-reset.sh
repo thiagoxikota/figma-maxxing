@@ -5,7 +5,7 @@
 #   bash figma-bridge-reset.sh                        # uses $FIGMA_BRIDGE_DEFAULT_URL or the last-used URL
 #   bash figma-bridge-reset.sh myapp                  # resolves the alias from <state-dir>/figma-files.json
 #   bash figma-bridge-reset.sh "https://figma.com/..." # literal URL
-#   FIGMA_GENTLE=1 bash figma-bridge-reset.sh         # do not quit Figma: only kill this session's MCP servers + plugin menu click
+#   FIGMA_FULL_RESET=1 bash figma-bridge-reset.sh     # quit and relaunch Figma: ONLY after the user said yes
 #   FIGMA_NO_PLUGIN=1 bash figma-bridge-reset.sh      # skip the osascript plugin re-launch
 #   FIGMA_KILL_OTHER_SESSIONS=1 bash figma-bridge-reset.sh   # also kill the MCP servers of OTHER sessions (only when solo)
 #   FIGMA_AGENT_PROCESS=<name> bash figma-bridge-reset.sh    # process name of the agent (default: claude), see step 1
@@ -25,11 +25,11 @@
 # tabs that were open and lets Figma's shutdown handler run. NEVER `killall Figma`:
 # that leaves Figma in a 0-window state where no plugin can attach.
 #
-# Set FIGMA_GENTLE=1 if you do NOT want to quit Figma. Gentle mode only kills
-# stale MCP servers and clicks the plugin menu. Per the field note above it is
-# the less reliable path, but it never quits Figma, so it is the default the
-# skill uses: the user may be working in Figma right now. Run without it (the
-# full quit + relaunch) only after the user said yes to a Figma restart.
+# By default the script is GENTLE: it never quits Figma. It only kills stale MCP
+# servers and clicks the plugin menu. Per the field note above that is the less
+# reliable path, but the user may be working in Figma right now. Set
+# FIGMA_FULL_RESET=1 (the full quit + relaunch) only after the user said yes to a
+# Figma restart. FIGMA_GENTLE=1 is still accepted and always wins.
 #
 # macOS only (osascript, open, launchctl, lsof, pgrep). The menu click needs the
 # Accessibility permission on the app that runs this script and assumes the
@@ -100,7 +100,8 @@ fi
 
 echo "-- figma-console Bridge reset --"
 [ -n "$FIGMA_URL" ] && echo "target:    $FIGMA_URL" || echo "target:    (no URL)"
-[ "${FIGMA_GENTLE:-0}" = "1" ] && echo "mode:      gentle (no Figma quit)" || echo "mode:      full (will quit + relaunch Figma)"
+FULL_RESET=0; [ "${FIGMA_FULL_RESET:-0}" = "1" ] && [ "${FIGMA_GENTLE:-0}" != "1" ] && FULL_RESET=1
+[ "$FULL_RESET" = "0" ] && echo "mode:      gentle (no Figma quit)" || echo "mode:      full (will quit + relaunch Figma)"
 
 # -- 1. Kill stale MCP servers LISTENing on 9223-9232 --------------------------
 # Use `lsof -t -i tcp:PORT -s TCP:LISTEN` (not `-ti tcp:PORT`: that returns every
@@ -178,8 +179,8 @@ done
 # Cache URL for next no-arg call.
 [ -n "$FIGMA_URL" ] && echo "$FIGMA_URL" > "$URL_CACHE"
 
-# -- 2. Graceful quit of Figma (unless FIGMA_GENTLE=1) -------------------------
-if [ "${FIGMA_GENTLE:-0}" != "1" ]; then
+# -- 2. Graceful quit of Figma (only with FIGMA_FULL_RESET=1) ------------------
+if [ "$FULL_RESET" = "1" ]; then
   if pgrep -x Figma >/dev/null 2>&1; then
     echo
     echo "-> graceful quit of Figma Desktop (preserves tabs, no killall)"

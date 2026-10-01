@@ -3,7 +3,8 @@ name: figma-bridge-doctor
 description: >-
   Single owner of the connection between Figma Desktop and the figma-console MCP Desktop Bridge
   plugin, alias-agnostic, across every project. Use on any intent to open, activate, restart or
-  check Figma or the bridge, and before any figma-console tool call. Trigger phrases: "open the Figma file", "is the bridge connected?", "restart the bridge",
+  check Figma or the bridge, and before any figma-console tool call. Trigger phrases: "open the
+  Figma file", "is the bridge connected?", "restart the bridge",
   "abre o figma", "liga a bridge". Probes state, takes the minimum action, verifies with
   figma_get_status and escalates at most 4 times. Always Figma Desktop, never the browser.
   The automation is macOS only.
@@ -43,7 +44,7 @@ State files live under the state dir, `${FIGMA_MAXXING_STATE_DIR:-$HOME/.config/
 |---|---|---|
 | `FIGMA_MAXXING_STATE_DIR` | all scripts | Moves the state dir. |
 | `FIGMA_ACCESS_TOKEN` | the MCP server | Figma personal access token for REST backed tools. The same variable figma-console-mcp reads. Never print it, never write it to a file. |
-| `FIGMA_GENTLE=1` | `figma-bridge-reset.sh` | Do not quit Figma. Always set it, unless the user said yes to a restart (Step 5). |
+| `FIGMA_FULL_RESET=1` | `figma-bridge-reset.sh` | Quit and relaunch Figma. Without it the script never quits Figma. Set it only after the user said yes to a restart (Step 5). |
 | `FIGMA_NO_PLUGIN=1` | `figma-open.sh`, `figma-bridge-reset.sh` | Skip the plugin trigger. |
 | `FIGMA_KILL_OTHER_SESSIONS=1` | `figma-bridge-reset.sh` | Also kill the MCP servers of other sessions. Only when solo. |
 | `FIGMA_AGENT_PROCESS` | `figma-status.sh`, `figma-bridge-reset.sh` | Process name of the agent that spawns the MCP servers (default `claude`, the Claude Code process). Used to tell this session's server from the others. |
@@ -102,7 +103,7 @@ Based on state + target:
 | Bridge DOWN, Figma running with a file open | <X> | osascript menu click (Step T below) if last-opened was <X>, else `figma-open.sh <X>` |
 | Bridge DOWN, Figma running but no file | <X> | `figma-open.sh <X>` |
 | Bridge DOWN, Figma not running | <X> | `figma-open.sh <X>` (it opens Figma + waits + clicks) |
-| Bridge UP but acting flaky / stale data | <X> | `figma_reconnect`, then verify; if still bad, `FIGMA_GENTLE=1 bash scripts/figma-bridge-reset.sh <X>` |
+| Bridge UP but acting flaky / stale data | <X> | `figma_reconnect`, then verify; if still bad, `bash scripts/figma-bridge-reset.sh <X>` (gentle by default) |
 
 As of figma-console-mcp v1.40.8, `figma_reconnect` is informational: it does not repair a dead connection, and `figma_get_status` is the only proof of a live connection. The last row still calls it first; `figma_get_status` decides whether to move on to the reset.
 
@@ -114,14 +115,14 @@ figma_get_status probe:true
 
 connected to target file -> DONE, report briefly: "bridge on <file>, port <N>, latency <ms>"
 disconnected -> escalate:
-  attempt 1: FIGMA_GENTLE=1 figma-bridge-reset.sh <alias> (Figma stays open)
-  attempt 2: consent-gated full reset: ask first, then figma-bridge-reset.sh <alias>
-             WITHOUT FIGMA_GENTLE (quit + relaunch); on no, go to attempt 3
+  attempt 1: figma-bridge-reset.sh <alias> (gentle by default, Figma stays open)
+  attempt 2: consent-gated full reset: ask first, then FIGMA_FULL_RESET=1
+             figma-bridge-reset.sh <alias> (quit + relaunch); on no, go to attempt 3
   attempt 3: consent-gated tight-loop atomic re-attach (multi-session race fix, below)
   attempt 4: manual checklist to user, STOP
 ```
 
-**Never quit Figma Desktop without asking.** The user may be working in it right now. Every path in this skill runs `figma-bridge-reset.sh` with `FIGMA_GENTLE=1` by default. Any step that quits Figma, today only the full reset of attempt 2, first asks one short question and waits for an explicit yes:
+**Never quit Figma Desktop without asking.** The user may be working in it right now. `figma-bridge-reset.sh` never quits Figma unless `FIGMA_FULL_RESET=1` is set. Any step that quits Figma, today only the full reset of attempt 2, first asks one short question and waits for an explicit yes:
 
 > "The bridge is still down. Can I quit and reopen Figma Desktop? Your open tabs come back after the relaunch."
 
@@ -139,7 +140,7 @@ Tight-loop atomic re-attach (multi-session race), respawn-low (win the attach wi
 
 - **Menu click only launches the plugin when a file is open in Figma.** Empty Figma + click = no-op. Always open first.
 - **Multi-session safety**: `figma-bridge-reset.sh` defaults to killing ONLY this session's MCP server. Other Claude Code sessions on 9223-9232 are SKIPPED by a process-tree check: a server is this session's when its nearest ancestor named `claude` (or `$FIGMA_AGENT_PROCESS`) is the same process as the script's. Comparing whole ancestor chains is not enough, because every session started from the same terminal app shares the terminal's ancestors. If the script finds no such ancestor it kills nothing and says so. `figma-status.sh` uses the same check for `my_mcp_port`, and splits every other listener in two: `orphans=` (no live owner: the server and its own npx wrapper lead straight to launchd, so the session that started it is gone) and `other_sessions=` (anything else, such as another agent session). Set `FIGMA_KILL_OTHER_SESSIONS=1` to kill all of them (only when solo).
-- **The full reset quits Figma.** It is a graceful quit that preserves the open tabs, then a relaunch. `FIGMA_GENTLE=1` skips the quit and is the default for every call; the full reset needs the user's yes first (Step 5). Never `killall Figma`: that leaves Figma in a 0-window state where no plugin can attach.
+- **The full reset quits Figma.** It is a graceful quit that preserves the open tabs, then a relaunch. The script skips the quit by default and runs it only with `FIGMA_FULL_RESET=1`, which needs the user's yes first (Step 5). Never `killall Figma`: that leaves Figma in a 0-window state where no plugin can attach.
 - **First sync each session**: when the user first mentions Figma in a session, run `figma-status.sh` + `figma_get_status` BEFORE asking them anything. Often you can answer "is it connected?" without any further input.
 
 ## Plugin version: THREE layers, and the banner does not say the direction
@@ -316,7 +317,7 @@ It is optional and off by default. `figma-open.sh` and `figma-bridge-reset.sh` c
 - `scripts/figma-status.sh`: local snapshot (ports, sessions, cached URL, plugin drift)
 - `scripts/figma-open.sh <alias|url|list>`: open the file + trigger the plugin
 - `scripts/figma-add.sh <url> [alias] [label]`: register an alias
-- `scripts/figma-bridge-reset.sh <alias|url>`: kill this session's server + open + trigger; with `FIGMA_GENTLE=1` unless the user agreed to a Figma restart
+- `scripts/figma-bridge-reset.sh <alias|url>`: kill this session's server + open + trigger; gentle by default; `FIGMA_FULL_RESET=1` only after the user agreed to a Figma restart
 - `scripts/mcp-direct/`: direct client for the layer 1 fallback
 - `scripts/figma-watchdog.sh` + the plist template: optional watchdog
 - `<state-dir>/figma-files.json`: canonical alias registry

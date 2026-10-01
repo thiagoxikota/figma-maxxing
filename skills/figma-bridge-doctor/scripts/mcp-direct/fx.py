@@ -24,5 +24,7 @@ try:
     r = json.load(urllib.request.urlopen(req, timeout=300))
 except urllib.error.HTTPError as e:
     sys.exit(f'daemon refused the call: HTTP {e.code} {e.read().decode(errors="replace")[:300]}')
+except urllib.error.URLError as e:
+    sys.exit(f'daemon not reachable: {e.reason}. Is daemon.mjs running on this HTTP_PORT?')
 for c in r.get('content', [{"type": "text", "text": json.dumps(r)}]):
     print(c.get('text', ''))

@@ -90,7 +90,7 @@ function removeTokenFile() {
   } catch { /* already gone */ }
 }
 process.on('exit', removeTokenFile);
-process.on('SIGTERM', () => process.exit(0));
+for (const sig of ['SIGTERM', 'SIGINT', 'SIGHUP']) process.on(sig, () => process.exit(0));
 
 function bearerOk(header) {
   const m = /^Bearer\s+(\S+)\s*$/i.exec(header || '');

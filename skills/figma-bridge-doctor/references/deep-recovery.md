@@ -1,8 +1,8 @@
 # figma-bridge-doctor: deep recovery (rare, multi-session or marathon session)
 
 Rare procedures that do not need to load on every invocation of the skill. Load this file at
-escalation attempt 3 (attempts 1 and 2 of the normal escalation failed in a multi-session
-scenario), or after hours of session with orphan ports.
+escalation attempt 3 (attempt 1 failed and attempt 2 failed or was declined, in a
+multi-session scenario), or after hours of session with orphan ports.
 
 Everything here is macOS only (`lsof`, `kill`, `osascript`). The menu click needs the Accessibility
 permission on the app that runs the command and assumes the English Figma UI. Script names refer to
