@@ -102,20 +102,37 @@ Field note, 2026-06. When a design system spec REQUIRES the translucent fill to 
 - **BREAKS: in-place mutate after bind does not stick** (the paint is read-only): `p.opacity = 0.1` silently no-ops and the fill renders at full opacity.
 - **ALWAYS VERIFY, then fall back:** after assigning, read `node.fills[0].opacity` and `.boundVariables.color`. If the API stomped opacity to 1 (the 2026-05 case above still happens with some token alphas), fall back to raw rgba. So: bind with literal opacity, verify, raw rgba fallback. Use raw rgba freely when the project spec tolerates it; use bind-then-verify when the spec demands no raw hex.
 
-## getAnnotations: separate fetch required
+## Annotations: read and write the `annotations` property
 
-The `get_design_context` tool (official Figma MCP server) MAY omit the `annotations` array on a node to save tokens. Annotations stored via `figma.setAnnotations(...)` will not appear in the context payload reliably.
+The `get_design_context` tool (official Figma MCP server) MAY omit a node's annotations to save tokens. For handoff-grade extraction (accessibility labels, validation specs, analytics events, behavior contracts), read them from the node itself.
 
-To extract annotations as machine-readable handoff carriers (a11y labels, validation specs, analytics events, behavior contracts):
+There is no `getAnnotations()` or `setAnnotations()` method. Annotations live in the `node.annotations` property, and the file's categories live in `figma.annotations`. Checked against `@figma/plugin-typings` 1.140.0 (2026-10).
 
 ```javascript
-// In figma_execute: raw Plugin API call
-const node = await figma.getNodeByIdAsync('NODE_ID');
-const annotations = node.getAnnotations();  // returns array of Annotation objects
-return { annotations };
+// In figma_execute: read
+const node = await figma.getNodeByIdAsync('123:456');
+if (!node || !('annotations' in node)) return { error: 'node not found or not annotatable' };
+const categories = await figma.annotations.getAnnotationCategoriesAsync();
+return {
+  annotations: node.annotations, // [{ label | labelMarkdown, properties: [{ type }], categoryId }]
+  categories: categories.map(c => ({ id: c.id, label: c.label })),
+};
 ```
 
-Use `setAnnotations` with structured `properties` (JSON) and a stable `categoryId` (e.g. `"ACCESSIBILITY"`, `"BEHAVIOR"`, `"ANALYTICS"`). Convention for property keys: prefix by domain (`a11y:role`, `a11y:label`, `copy:text`, `analytics:event-name`, `behavior:validation-regex`).
+Writing replaces the whole array, like `fills`. Each annotation carries text (`label` or `labelMarkdown`, use one), optional pinned measurements (`properties: [{ type: 'width' }]`, where `type` is an `AnnotationPropertyType` such as `width`, `height`, `fills`, `cornerRadius`, `padding` or `itemSpacing`) and an optional `categoryId` from the file's categories. There is no free-form JSON field: if you need machine-readable keys, put them in the text (for example `a11y: role=button`).
+
+```javascript
+// In figma_execute: append one annotation in a category, then read back
+let cat = (await figma.annotations.getAnnotationCategoriesAsync()).find(c => c.label === 'Accessibility');
+if (!cat) cat = await figma.annotations.addAnnotationCategoryAsync({ label: 'Accessibility', color: 'teal' });
+node.annotations = [
+  ...node.annotations,
+  { labelMarkdown: '**a11y:** role=button, label "Save draft"', categoryId: cat.id, properties: [{ type: 'width' }] },
+];
+return { count: node.annotations.length, last: node.annotations[node.annotations.length - 1] };
+```
+
+Category colors are limited to `yellow`, `orange`, `red`, `pink`, `violet`, `blue`, `teal` and `green`. A category's name is `label`, not `name`.
 
 Density cap: at most 10 to 15 annotations per node, to stay under the 20 KB output ceiling when reading them back (see `references/figma-execute-atomicity.md`).
 
@@ -220,5 +237,5 @@ Each line is something NOT to do, followed by the fix or the reason.
 - Calling `figma.notify()`: not implemented (observed in `use_figma`). Never use it for output on any path; use `return`.
 - Defaulting variable scopes to `['ALL_SCOPES']`: pick the narrowest scope set.
 - Reading only `fillStyleId` OR only `boundVariables` to determine what is applied: read both; exactly one is set per property.
-- Assuming `get_design_context` returns annotations: re-fetch via `getAnnotations()` for handoff-grade extraction.
+- Assuming `get_design_context` returns annotations: read `node.annotations` for handoff-grade extraction.
 - Gray-placeholder fallback when image fills are needed: `figma.createImage(bytes)` works inside `figma_execute`.

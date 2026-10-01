@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [semantic versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- Annotations: `plugin-api-data.md` taught `node.getAnnotations()` and `figma.setAnnotations()`, which do not exist. It now uses the `node.annotations` property and `figma.annotations`, checked against `@figma/plugin-typings` 1.140.0.
+- `use_figma` is no longer described as always atomic: on an error, obey `safeToRetryWithoutCanvasRead` and read the canvas before retrying when it is `false`.
+
 ## [1.0.0] - 2026-10-01
 
 First public release.

@@ -71,7 +71,7 @@ const c = await figma.variables.getVariableCollectionByIdAsync(id);
 ## Atomicity: depends on the path
 
 - `figma_execute` (figma-console Desktop Bridge, the live write path) is NOT atomic: a script that fails mid-way can leave partial nodes. After any failure, sweep the parent for orphans before retrying (detail in `references/figma-execute-atomicity.md`).
-- `use_figma` (official Figma MCP server; this canon treats that server as the fallback for reads) applies the block as one transaction and rolls back on error.
+- `use_figma` (official Figma MCP server) used to be described as all-or-nothing. As of 2026-10 its error response carries a `safeToRetryWithoutCanvasRead` flag. When it is `true`, fix the script and retry. When it is `false`, part of the block may have applied: read the canvas, remove what the failed run left, then retry. Never assume a rollback.
 - On either path the error message is the diagnostic: read it, fix the JS, then retry. Never retry blind.
 
 ## `figma.mixed` is a SYMBOL: it breaks the `return` of figma_execute

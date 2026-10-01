@@ -76,7 +76,7 @@ Two paths pass this check. Only an MCP call proves the connection: a shell comma
 > **Advisory pre-check A0 (optional, path A; path B already runs it):** Call `whoami` (official
 > Figma MCP server) once per session if you do not know which seat the connected account holds OR
 > you are writing to a file you do not own. A seat mismatch (for example a Dev seat writing to a published library) fails loudly
-> through Figma's atomic rollback, so this is an *early feedback* convenience, not a silent
+> with a permission error, so this is an *early feedback* convenience, not a silent
 > failure preventer. **Skip for:** a solo developer on personal drafts, sessions where you already
 > know the seat, or when you are on the Starter plan's MCP tool call budget. The 7 hard checks
 > below cover the silent failures.
