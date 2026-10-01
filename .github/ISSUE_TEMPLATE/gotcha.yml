@@ -1,0 +1,35 @@
+name: New gotcha
+description: A Figma Plugin API or bridge behavior that surprised you, with the fix you ran.
+labels: [gotcha]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks. Please leave out client names, file keys, node ids from real files, tokens and screenshots of work you do not own.
+  - type: textarea
+    id: symptom
+    attributes:
+      label: Symptom
+      description: What you saw. "The section renders black", "the call returns success and nothing changes".
+    validations:
+      required: true
+  - type: textarea
+    id: cause
+    attributes:
+      label: Cause
+      description: What is really going on, if you know. "Not established" is a fine answer.
+  - type: textarea
+    id: fix
+    attributes:
+      label: Fix
+      description: What you ran that worked. Code welcome.
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions and month
+      description: Figma Desktop, figma-console-mcp, agent, and when you saw it.
+      placeholder: Figma Desktop 126, figma-console-mcp 1.40.8, Claude Code, 2026-10
+    validations:
+      required: true

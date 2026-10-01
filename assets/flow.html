@@ -1,0 +1,44 @@
+<!doctype html>
+<!-- Diagram source. Fonts (SIL Open Font License, from Google Fonts): Sora, JetBrains Mono.
+     Put the three .ttf files next to this file and screenshot at 1600x570, scale 2, with ?theme=dark and ?theme=light. -->
+<html><head><meta charset="utf-8">
+<style>
+@font-face { font-family: Sora; src: url(Sora.ttf); font-weight: 100 800; }
+@font-face { font-family: Mono; src: url(JetBrainsMono.ttf); font-weight: 100 800; }
+:root { --bg:#0B0C11; --ink:#E8E4DC; --card:#161722; --line:#2B2D3C; --mute:#A3A5B3; --signal:#DC000C; --signal-ink:#FF4A3D; }
+:root[data-theme="light"] { --bg:#E8E4DC; --ink:#161722; --card:#F6F3EC; --line:#C9C3B6; --mute:#5E606C; --signal:#DC000C; --signal-ink:#9A060D; }
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 1600px; height: 570px; background: var(--bg); color: var(--ink); overflow: hidden; font-family: Sora; }
+.wrap { padding: 64px 72px; display: grid; gap: 34px; }
+h2 { font-family: Sora; font-weight: 700; font-size: 50px; letter-spacing: -0.045em; line-height: 1; }
+.row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 28px; position: relative; }
+.step { background: var(--card); border: 1.5px solid var(--line); border-radius: 18px; padding: 24px 22px 26px; position: relative; }
+.step.write { border-color: var(--signal); }
+.n { font-family: Mono; font-size: 18px; color: var(--ink); }
+.t { font-size: 27px; font-weight: 600; letter-spacing: -0.015em; margin-top: 10px; line-height: 1.15; }
+.s { font-family: Mono; font-size: 18px; margin-top: 14px; color: var(--signal-ink); font-weight: 600; }
+.d { font-size: 18px; line-height: 1.4; margin-top: 12px; color: var(--ink); }
+.step:not(:last-child)::after { content: ""; position: absolute; right: -24px; top: 50%; width: 20px; height: 2px; background: var(--ink); }
+.step:not(:last-child)::before { content: ""; position: absolute; right: -25px; top: calc(50% - 6px); border: 7px solid transparent; border-left: 9px solid var(--ink); border-right: 0; }
+.band { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.b { border: 1.5px dashed var(--line); border-radius: 18px; padding: 22px 24px; display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; }
+.b .s { margin: 0; white-space: nowrap; }
+.b .d { margin: 0; color: var(--ink); font-size: 20px; }
+</style></head>
+<body>
+<div class="wrap">
+  <h2>How the skills fit together</h2>
+  <div class="row">
+    <div class="step"><div class="n">01</div><div class="t">Map the file</div><div class="s">figma-orient</div><div class="d">Pages, components, variables. Saved for next time.</div></div>
+    <div class="step"><div class="n">02</div><div class="t">Check before writing</div><div class="s">figma-preflight</div><div class="d">Target, tokens, real components, real icons.</div></div>
+    <div class="step write"><div class="n">03</div><div class="t">Write</div><div class="s">figma_execute</div><div class="d">Your agent edits the file through the bridge.</div></div>
+    <div class="step"><div class="n">04</div><div class="t">Check after writing</div><div class="s">figma-slop-check</div><div class="d">Looks machine made? Is it precise?</div></div>
+    <div class="step"><div class="n">05</div><div class="t">Hand off</div><div class="s">figma-handoff-gate</div><div class="d">Every action has an outcome and a way back.</div></div>
+  </div>
+  <div class="band">
+    <div class="b"><div class="s">figma-canon</div><div class="d">The rules and gotchas every step reads.</div></div>
+    <div class="b"><div class="s">figma-comment-fix-loop</div><div class="d">Runs steps 02 to 04 once per comment.</div></div>
+  </div>
+</div>
+<script>document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || 'dark';</script>
+</body></html>

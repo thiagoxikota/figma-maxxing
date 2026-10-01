@@ -1,0 +1,14 @@
+{
+  "name": "figma-maxxing-skills",
+  "owner": {
+    "name": "Thiago Xikota"
+  },
+  "plugins": [
+    {
+      "name": "figma-maxxing",
+      "source": "./",
+      "description": "Agent skills for real Figma files: Plugin API gotchas, checks before and after a write, comments to verified fixes, handoff gate."
+    }
+  ],
+  "description": "Figma skills for AI agents, by Thiago Xikota."
+}

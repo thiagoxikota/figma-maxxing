@@ -1,0 +1,24 @@
+name: Something depends on the author's setup
+description: A step, path or tool in a skill that does not exist on your machine.
+labels: [portability]
+body:
+  - type: input
+    id: skill
+    attributes:
+      label: Skill and file
+      placeholder: skills/figma-preflight/SKILL.md
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What the skill asked for, and what happened
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Your environment
+      placeholder: macOS 15, Claude Code 2.1, figma-console-mcp 1.40.8
+    validations:
+      required: true

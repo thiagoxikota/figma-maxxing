@@ -1,0 +1,38 @@
+<!doctype html>
+<!-- Banner source. Fonts (SIL Open Font License, from Google Fonts): Sora, JetBrains Mono.
+     Put the three .ttf files next to this file and screenshot at 1280x640, scale 2, with ?theme=dark and ?theme=light. -->
+<html><head><meta charset="utf-8">
+<style>
+@font-face { font-family: Sora; src: url(Sora.ttf); font-weight: 100 800; }
+@font-face { font-family: Mono; src: url(JetBrainsMono.ttf); font-weight: 100 800; }
+:root { --bg:#0B0C11; --ink:#E8E4DC; --card:#161722; --line:#2B2D3C; --mute:#9395A3; --signal:#DC000C; }
+:root[data-theme="light"] { --bg:#E8E4DC; --ink:#161722; --card:#F6F3EC; --line:#C9C3B6; --mute:#5E606C; --signal:#DC000C; }
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 1280px; height: 640px; background: var(--bg); color: var(--ink); overflow: hidden; }
+.wrap { display: grid; grid-template-columns: 1fr 452px; gap: 56px; align-items: center; height: 100%; padding: 0 76px; }
+h1 { font-family: Sora; font-weight: 700; font-size: 104px; line-height: 0.98; letter-spacing: -0.055em; }
+p { font-family: Sora; font-weight: 400; font-size: 30px; line-height: 1.36; letter-spacing: -0.01em; margin-top: 34px; }
+.card { background: var(--card); border: 1.5px solid var(--line); border-radius: 18px; padding: 10px 30px; }
+.row { display: grid; grid-template-columns: 62px 34px 1fr; align-items: center; height: 92px; font-family: Mono; font-size: 25px; }
+.row + .row { border-top: 1.5px solid var(--line); }
+.k { font-family: Mono; font-size: 21px; font-weight: 500; }
+.sw { width: 24px; height: 24px; border-radius: 6px; }
+.raw .sw { background: var(--signal); }
+.raw .v { color: var(--mute); text-decoration: line-through; text-decoration-thickness: 2.5px; }
+.raw .k { color: var(--mute); }
+.tok .sw { background: var(--signal); }
+.tok .v { font-weight: 600; }
+</style></head>
+<body>
+<div class="wrap">
+  <div>
+    <h1>Figma<br>Maxxing</h1>
+    <p>Agent skills for real<br>Figma files, by Thiago Xikota.</p>
+  </div>
+  <div class="card">
+    <div class="row raw"><span class="k">Fill</span><span class="sw"></span><span class="v">#DC000C</span></div>
+    <div class="row tok"><span class="k">Fill</span><span class="sw"></span><span class="v">color/brand/signal</span></div>
+  </div>
+</div>
+<script>document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || 'dark';</script>
+</body></html>
