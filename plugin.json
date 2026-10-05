@@ -1,7 +1,6 @@
 {
-  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "figma-maxxing",
-  "displayName": "Figma Maxxing",
   "version": "1.1.0",
   "description": "Agent skills for real Figma files: Plugin API gotchas, checks before and after every write, comments to verified fixes, handoff gate.",
   "author": {
@@ -19,8 +18,5 @@
     "design-qa",
     "claude-code",
     "agent-skills"
-  ],
-  "documentationUrl": "https://github.com/thiagoxikota/figma-maxxing#readme",
-  "supportUrl": "https://github.com/thiagoxikota/figma-maxxing/issues",
-  "privacyPolicyUrl": "https://github.com/thiagoxikota/figma-maxxing/blob/main/PRIVACY.md"
+  ]
 }

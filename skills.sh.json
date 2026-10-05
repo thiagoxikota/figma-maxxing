@@ -1,0 +1,37 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "groupings": [
+    {
+      "title": "Before you write",
+      "description": "Map the file, load the Plugin API rules and check the target before any node is written.",
+      "skills": [
+        "figma-orient",
+        "figma-preflight",
+        "figma-canon"
+      ]
+    },
+    {
+      "title": "After you write",
+      "description": "Look for machine-made tells and precision defects, then check what a developer needs.",
+      "skills": [
+        "figma-slop-check",
+        "figma-handoff-gate"
+      ]
+    },
+    {
+      "title": "Workflows",
+      "description": "Turn open comments into fixes with evidence, and draw click-flow arrows for static handoff.",
+      "skills": [
+        "figma-comment-fix-loop",
+        "figma-click-flow"
+      ]
+    },
+    {
+      "title": "Connection",
+      "description": "Check and repair the link between your agent and Figma Desktop.",
+      "skills": [
+        "figma-bridge-doctor"
+      ]
+    }
+  ]
+}

@@ -1,14 +1,46 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "figma-maxxing-skills",
+  "description": "Agent skills for real Figma files: Plugin API gotchas, checks before and after every write, comments to verified fixes, handoff gate.",
   "owner": {
     "name": "Thiago Xikota"
+  },
+  "metadata": {
+    "description": "Agent skills for real Figma files: Plugin API gotchas, checks before and after every write, comments to verified fixes, handoff gate."
   },
   "plugins": [
     {
       "name": "figma-maxxing",
       "source": "./",
-      "description": "Agent skills for real Figma files: Plugin API gotchas, checks before and after a write, comments to verified fixes, handoff gate."
+      "displayName": "Figma Maxxing",
+      "description": "Agent skills for real Figma files: Plugin API gotchas, checks before and after every write, comments to verified fixes, handoff gate.",
+      "author": {
+        "name": "Thiago Xikota"
+      },
+      "homepage": "https://github.com/thiagoxikota/figma-maxxing",
+      "repository": "https://github.com/thiagoxikota/figma-maxxing",
+      "license": "MIT",
+      "keywords": [
+        "figma",
+        "figma-plugin-api",
+        "design-systems",
+        "design-tokens",
+        "handoff",
+        "design-qa",
+        "claude-code",
+        "agent-skills"
+      ],
+      "category": "design",
+      "tags": [
+        "figma",
+        "figma-plugin-api",
+        "design-systems",
+        "design-tokens",
+        "handoff",
+        "design-qa",
+        "claude-code",
+        "agent-skills"
+      ]
     }
-  ],
-  "description": "Figma skills for AI agents, by Thiago Xikota."
+  ]
 }
