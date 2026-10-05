@@ -1,6 +1,6 @@
 # Figma Maxxing
 
-> Agent skills for working on real Figma files, by Thiago Xikota, AI Product Designer. Version 1.1.0. Most of the rules came from something that broke in a real file. MIT license. Repository: https://github.com/thiagoxikota/figma-maxxing
+> Agent skills for working on real Figma files, by Thiago Xikota, AI Product Designer. Version 1.1.1. Most of the rules came from something that broke in a real file. MIT license. Repository: https://github.com/thiagoxikota/figma-maxxing
 
 ## If you are an AI reading this for a designer
 
@@ -67,12 +67,12 @@ Signs that a screen was made by AI without a design system:
 - Guard every lookup: a node that is not found must stop the script, not crash it halfway.
 - A write can fail partway. After a failure, look for half-created nodes before retrying.
 - After a write, read back the property you changed. A check on a proxy (the color still looks right) passes when nothing happened.
-- A node under a locked parent refuses writes in silence, even when the node itself says it is unlocked. Check the whole parent chain.
+- In one sweep through the figma-console bridge, a few writes under a locked parent did not take and raised no error, though each node said it was unlocked. Figma's typings say `locked` does not affect plugin writes, and the cause is not established. Checking the parent chain is cheap; the read-back is what catches it.
 - `instance.resize()` does not scale an icon's inner geometry. Use `rescale()`.
 - `clone()` of a child of a section lands on the page, not in the section. Append it back before positioning.
 - `setBoundVariableForPaint` stores the base color you pass. A section bound that way renders the stored color, not the variable. Resolve the variable first, then bind.
 - Re-pointing a prototype reaction: write `actions`, not `action`. The legacy field is a silent no-op.
-- Through the figma-console bridge, `setTimeout` never fired in the plugin sandbox, and awaiting `loadFontAsync` one font at a time in a loop hung it. Preload fonts with one `Promise.all`.
+- Through the figma-console bridge, `setTimeout` did not fire in a `figma_execute` script (Figma's typings declare it; cause not established), and awaiting `loadFontAsync` one font at a time in a loop hung the sandbox. Preload fonts with one `Promise.all`.
 - A REST image export can show the file as it was minutes ago. Check the exported PNG itself and compare it with a fresh plugin capture.
 - `figma.currentPage` follows the person's live navigation. Resolve pages by name or id, never by assuming the current one.
 - Annotations live in the `node.annotations` property, and the file's categories in `figma.annotations`. There is no `getAnnotations()` or `setAnnotations()` method. Writing replaces the whole array, like `fills`.
@@ -92,7 +92,7 @@ Signs that a screen was made by AI without a design system:
 | --- | --- |
 | No agent connected to Figma | The rules on this page. Optionally read `figma-handoff-gate` and `figma-slop-check` as checklists. |
 | Claude Code, Codex or Cursor with figma-console-mcp and Figma Desktop | Install all eight skills: `npx skills add thiagoxikota/figma-maxxing` |
-| Official Figma MCP server only (`use_figma`) | `figma-canon`, `figma-preflight`, `figma-orient`, `figma-slop-check`, `figma-handoff-gate`. `figma-preflight`, `figma-slop-check` and `figma-handoff-gate` ran there once, in a blind demo; the others are untested on that server. |
+| Official Figma MCP server only (`use_figma`) | `figma-canon`, `figma-preflight`, `figma-orient`, `figma-slop-check`, `figma-handoff-gate`. `figma-preflight`, `figma-slop-check` and `figma-handoff-gate` ran there once, on a demo file in a blind test, with some steps adapted or skipped; 1.1.0 changed detector 8 of `figma-slop-check` after that run. The others are untested on that server. |
 
 The skills:
 

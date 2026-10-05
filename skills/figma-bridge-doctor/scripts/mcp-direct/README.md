@@ -64,7 +64,9 @@ the task is done, and never bind it to another interface.
 
 `GET /tools` lists the tools the server registered (name and input schema). Any other request is
 a `POST` with `{"name": "<tool>", "arguments": {...}}` and returns the tool result. Both need the
-bearer token.
+bearer token. When a request fails inside the daemon, the client gets a `500` with a fixed
+message (body not valid JSON, server timeout, or internal error) and the detail goes to the
+daemon's stderr only.
 
 ## The daemon resolves the npx cache by VERSION, never by mtime (field note, 2026-09)
 
@@ -75,8 +77,9 @@ own bundle: starting the wrong daemon **downgraded the plugin on disk**, and the
 the move was backwards. Now the resolver reads `package.json` of each cache and sorts by semver;
 the chosen version is printed to stderr at boot (`mcp-direct: using figma-console-mcp <v>`).
 
-The cache directory is resolved at runtime as `$(npm config get cache)/_npx`, because the npm
-cache location differs per machine.
+The cache directory is resolved at runtime as `<npm cache>/_npx`, because the npm cache location
+differs per machine. `<npm cache>` is `npm_config_cache` when npm exported it, else the output of
+`npm config get cache` (run with a fixed argument list and no shell), else `~/.npm`.
 
 After starting this daemon, check `bash ../figma-status.sh | grep plugin_`: `plugin_drift=true`
 means some server downgraded the disk. The fix is in the skill:

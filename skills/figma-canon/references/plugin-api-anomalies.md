@@ -143,8 +143,8 @@ Field note, 2026-08.
   `duplicate attribute: line N, column M` for free.
 - **Fix at the source:** `re.sub(r'\s+fill="[^"]*"', "", potrace_tag)` before appending your own.
 - **Corollary for a large SVG:** do not transcribe the path by hand into `figma_execute` (it gets corrupted; the same happened with a base64 payload, field note 2026-07). Start a local server and `fetch` from inside the plugin. Requirements:
-  - the CORS header `Access-Control-Allow-Origin: *`;
-  - AND an IPv6 bind (`socketserver` with `address_family = AF_INET6`, bind on `::`), because the Desktop Bridge plugin manifest allows `localhost` and `localhost` resolves to `::1`. A server bound only to `127.0.0.1` returns "Failed to fetch".
+  - the CORS header `Access-Control-Allow-Origin: *` (Figma documents that plugin iframes have a `null` origin, so no specific origin can be listed);
+  - AND an IPv6 socket (`socketserver` with `address_family = AF_INET6`), because the Desktop Bridge plugin manifest allows `localhost` and `localhost` resolved to `::1`. A server bound only to `127.0.0.1` returned "Failed to fetch". The field run bound `::`, which listens on every interface: bind `::1`, the IPv6 loopback, instead. If `localhost` resolves only to `127.0.0.1` on your machine, bind `127.0.0.1`. Never bind `::` or `0.0.0.0`. The server code is in `references/plugin-api-data.md`.
 - See also, for the port: the manifest's `allowedDomains` lists `http://localhost:9223-9232` ("Plugin export as REST 429 bypass" below), and the bridge WebSocket itself listens inside that range, so use a port in it that nothing else is listening on.
 
 ## createNodeFromSvg carries raw hex and stray wrapper fills
@@ -389,7 +389,7 @@ node.fills = fills;
 - When the REST API hits 429 (after ~6 batched `get_screenshot` calls, a tool of the official Figma MCP server; ~30+ min lockout), plugin export still works.
 - **Pattern:** use `figma_execute` with `node.exportAsync({format: "PNG"})` returning a Uint8Array.
 - **Export-to-disk pipeline (also bypasses a dead REST token):** run a tiny local HTTP server on port 9232 (the top of the bridge's port range; the bridge WebSocket can fall back to any port from 9223 to 9232, so pick another port in the range if something already listens on 9232) and `fetch('http://localhost:9232/?name=x.png', {method:'POST', body: bytes})` from inside `figma_execute`. The plugin manifest's `allowedDomains` lists `http://localhost:9223-9232`; **`127.0.0.1` fails with "Failed to fetch"**, always use `localhost` (field note, 2026-07).
-  - The receiving server is not shipped in this repo. It has to handle this POST and meet the two requirements in the corollary of "createNodeFromSvg rejects the whole file on a duplicate attribute" above: the `Access-Control-Allow-Origin: *` header and an IPv6 bind on `::`. The CORS server template in `references/plugin-api-data.md` only serves GET and binds `127.0.0.1`, so add POST handling and switch it to an IPv6 socket (`address_family = socket.AF_INET6`, bind on `::`) before using it here.
+  - The receiving server is not shipped in this repo. It has to handle this POST and meet the two requirements in the corollary of "createNodeFromSvg rejects the whole file on a duplicate attribute" above: the `Access-Control-Allow-Origin: *` header and a loopback bind (`::1`, or `127.0.0.1` where `localhost` resolves only there). Use the "Export-to-disk server (POST)" in `references/plugin-api-data.md`: it binds `::1`, keeps only the basename of `name`, accepts only `.png` names and PNG bytes, and writes into one folder. Stop it when the export is done.
 - See `references/rate-limit-recovery.md` for the 429 lockout and the plugin export bypass. It does not cover the disk step above.
 - The same path works under the Starter-plan tool-call cap of the official Figma MCP server (caps depend on seat and plan): `figma_execute` and Plugin API calls go through the bridge, not the metered remote MCP surface.
 

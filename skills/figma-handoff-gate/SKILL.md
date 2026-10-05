@@ -15,7 +15,7 @@ compatibility: >-
   Reads the figma-canon skill; approved fixes go through figma-preflight.
 metadata:
   author: Thiago Xikota
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # figma-handoff-gate

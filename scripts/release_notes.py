@@ -2,14 +2,16 @@
 """Release gate: check that a version matches every manifest, then print its CHANGELOG section.
 
 Stdlib only. Fails (exit 1) when:
-  - the version differs from .claude-plugin/plugin.json, from CITATION.cff, or from the
+  - the version differs from any version field: .claude-plugin/plugin.json, every other JSON
+    file at the root or in a root dot folder (.codex-plugin/, .cursor-plugin/) that has a
+    top-level "version" string, CITATION.cff, the "Version x.y.z." line of llms.txt, or the
     metadata.version of any SKILL.md, or
   - CHANGELOG.md has no '## [<version>]' section, or the section is empty.
 Otherwise prints the section body, ready for `gh release create --notes-file`.
 
 Usage:
-  python3 scripts/release_notes.py 1.1.0 > notes.md
-  python3 scripts/release_notes.py v1.1.0            # a leading v is ignored
+  python3 scripts/release_notes.py 1.1.1 > notes.md
+  python3 scripts/release_notes.py v1.1.1            # a leading v is ignored
 """
 from __future__ import annotations
 
@@ -21,9 +23,23 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def json_manifests(root: Path = ROOT) -> list[Path]:
+    """JSON files at the root and in root dot folders (not .git), the places manifests live."""
+    found = set(root.glob('*.json')) | {p for p in root.glob('.*/*.json') if p.parts[-2] != '.git'}
+    return sorted(found)
+
+
 def versions(root: Path = ROOT) -> dict[str, str]:
     """Every version field in the repository, keyed by where it lives."""
     found = {'.claude-plugin/plugin.json': json.loads((root / '.claude-plugin/plugin.json').read_text())['version']}
+    for path in json_manifests(root):
+        data = json.loads(path.read_text())
+        if isinstance(data, dict) and isinstance(data.get('version'), str):
+            found[path.relative_to(root).as_posix()] = data['version']
+    llms = root / 'llms.txt'
+    if llms.is_file():
+        m = re.search(r'\bVersion (\d+\.\d+\.\d+)\.', llms.read_text())
+        found['llms.txt'] = m.group(1) if m else '(missing)'
     cff = root / 'CITATION.cff'
     if cff.is_file():
         m = re.search(r'^version:\s*["\']?([^"\'\s]+)', cff.read_text(), re.M)

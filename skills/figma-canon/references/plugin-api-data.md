@@ -174,7 +174,7 @@ Field note, verified 2026-05, in `figma_execute` through the figma-console Deskt
 
 1. **Manifest `networkAccess.allowedDomains`**: controls `fetch` + WebSocket. Listed = pass.
 2. **`figma.createImageAsync(url)` URL validator**: STRICTER. Rejects URLs that ARE in `allowedDomains`. Empirically rejects `http://localhost:*` even when explicitly listed. Returns `Image URL <url> does not satisfy the allowedDomains specified in the manifest.json`: a misleading error.
-3. **CORS on the response**: `fetch` requires `Access-Control-Allow-Origin: *` (or a matching origin). Plain `python3 -m http.server` returns no CORS headers and fails with a bare `"Failed to fetch"` (no stack).
+3. **CORS on the response**: `fetch` requires `Access-Control-Allow-Origin: *`. Figma's [network requests page](https://developers.figma.com/docs/plugins/making-network-requests/) says plugin iframes have a `null` origin, so there is no specific origin to list. Plain `python3 -m http.server` returns no CORS headers and fails with a bare `"Failed to fetch"` (no stack).
 
 **Working stack for arbitrary bytes from a local source.** Pick any free port inside the bridge plugin's localhost range, 9223 to 9232 (the figma-console-mcp plugin manifest lists that range). The bridge WebSocket itself listens inside the same range, starting at 9223, so use a port that nothing is listening on. `<PORT>` below stands for the port you picked: set the same number in the `PORT` constant of the server and in the script URL.
 
@@ -211,13 +211,48 @@ with socketserver.TCPServer(("127.0.0.1", PORT), H) as s:
     s.serve_forever()
 ```
 
-**If the fetch still fails with "Failed to fetch" while the CORS headers are in place, bind on IPv6.** A later field note (2026-08, the createNodeFromSvg corollary in `references/plugin-api-anomalies.md`) found that the plugin manifest allows `localhost`, `localhost` resolved to `::1`, and a server bound only to `127.0.0.1` returned "Failed to fetch". The fix there was `socketserver` with `address_family = AF_INET6`, bound on `::`. Replace the last two lines of the server above with:
+**If the fetch still fails with "Failed to fetch" while the CORS headers are in place, bind on IPv6 loopback.** A later field note (2026-08, the createNodeFromSvg corollary in `references/plugin-api-anomalies.md`) found that the plugin manifest allows `localhost`, `localhost` resolved to `::1`, and a server bound only to `127.0.0.1` returned "Failed to fetch". The fix recorded there was an IPv6 socket (`address_family = AF_INET6`) bound on `::`. Bind `::1` instead: `::` is the unspecified address and listens on every interface, while `::1` is the loopback address `localhost` resolved to. Replace the last two lines of the server above with:
 
 ```python
 import socket
 class Server6(socketserver.TCPServer):
     address_family = socket.AF_INET6
-with Server6(("::", PORT), H) as s:
+with Server6(("::1", PORT), H) as s:  # IPv6 loopback only; never "::" or "0.0.0.0"
+    s.serve_forever()
+```
+
+Which address to bind: `python3 -c "import socket; print({a[4][0] for a in socket.getaddrinfo('localhost', 9232)})"`. If it prints only `127.0.0.1`, keep the IPv4 server above, bound to `127.0.0.1`. The `::1` bind was checked with `curl http://localhost:<PORT>` on macOS (2026-10), not inside Figma; the field runs bound `::`.
+
+Both servers send `Access-Control-Allow-Origin: *` and listen on loopback, so a web page open in your browser can also reach them. Start the server for the task and stop it when the task is done.
+
+**Export-to-disk server (POST).** The export pipeline in `references/plugin-api-anomalies.md` ("Plugin export as REST 429 bypass") POSTs PNG bytes from `figma_execute` to `http://localhost:<PORT>/?name=<file>.png`. The `name` comes from a script, so the server keeps only its basename, accepts only `.png` names made of letters, digits, dot, dash and underscore, and refuses a body that does not start with the PNG signature:
+
+```python
+import http.server, os, re, socket, socketserver, urllib.parse
+PORT = 9232                       # any free port inside 9223-9232
+OUT = "/path/to/export/dir"       # the folder that receives the PNGs
+SAFE = re.compile(r"[A-Za-z0-9._-]{1,120}\.png")
+PNG = b"\x89PNG\r\n\x1a\n"
+class H(http.server.BaseHTTPRequestHandler):
+    def end_headers(self):
+        self.send_header("Access-Control-Allow-Origin", "*")  # plugin iframes have a null origin
+        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "*")
+        super().end_headers()
+    def do_OPTIONS(self):
+        self.send_response(204); self.end_headers()
+    def do_POST(self):
+        query = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query)
+        name = os.path.basename(query.get("name", [""])[0])
+        body = self.rfile.read(int(self.headers.get("Content-Length") or 0))
+        if not SAFE.fullmatch(name) or not body.startswith(PNG):
+            self.send_response(400); self.end_headers(); return
+        with open(os.path.join(OUT, name), "wb") as f:
+            f.write(body)
+        self.send_response(204); self.end_headers()
+class Server6(socketserver.TCPServer):
+    address_family = socket.AF_INET6
+with Server6(("::1", PORT), H) as s:  # or socketserver.TCPServer(("127.0.0.1", PORT), H)
     s.serve_forever()
 ```
 

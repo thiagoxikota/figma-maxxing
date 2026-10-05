@@ -343,9 +343,29 @@ class ReleaseNotesTests(unittest.TestCase):
 
     def test_versions_cover_every_manifest(self):
         found = release_notes.versions()
-        self.assertIn('.claude-plugin/plugin.json', found)
+        for where in ('.claude-plugin/plugin.json', '.codex-plugin/plugin.json', '.cursor-plugin/plugin.json',
+                      'plugin.json', 'gemini-extension.json', 'CITATION.cff', 'llms.txt'):
+            self.assertIn(where, found)
+        self.assertNotIn('.claude-plugin/marketplace.json', found)  # carries no version on purpose
         self.assertEqual(len([k for k in found if k.endswith('SKILL.md')]),
                          len(list((ROOT / 'skills').glob('*/SKILL.md'))))
+
+    def test_versions_flag_a_stale_json_manifest(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / '.claude-plugin').mkdir()
+            (root / '.claude-plugin/plugin.json').write_text('{"version": "2.0.0"}')
+            (root / '.cursor-plugin').mkdir()
+            (root / '.cursor-plugin/plugin.json').write_text('{"version": "1.9.0"}')
+            (root / '.git').mkdir()
+            (root / '.git/ignored.json').write_text('{"version": "0.0.1"}')
+            (root / 'skills.sh.json').write_text('{"groupings": []}')
+            (root / 'llms.txt').write_text('> Skills. Version 2.0.0. MIT.\n')
+            found = release_notes.versions(root)
+            self.assertEqual(found['.cursor-plugin/plugin.json'], '1.9.0')
+            self.assertEqual(found['llms.txt'], '2.0.0')
+            self.assertNotIn('.git/ignored.json', found)
+            self.assertNotIn('skills.sh.json', found)
 
 
 if __name__ == '__main__':

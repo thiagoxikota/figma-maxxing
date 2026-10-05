@@ -31,13 +31,13 @@ As of figma-console-mcp v1.40.8, the Bridge WebSocket listens on localhost port 
 | --- | --- | --- | --- |
 | `figma-developer-mcp` / Framelink >=0.6.3 | RISKY | Medium | Patched the CVE but no further audit. Avoid for enterprise. |
 | `figma-developer-mcp` / Framelink <0.6.3 | BANNED | Critical | CVE-2025-53967 RCE. Upgrade or remove. |
-| `talktofigma` | BANNED | High | Community-maintained, signs of abandonment, unpatched 2025 vectors (this canon's assessment; no advisory is cited here, so re-check the project before relying on this rating). |
+| `talktofigma` | UNVERIFIED | Not evaluated here | No advisory is cited and this canon has not evaluated the project. The default deny row below still applies: evaluate it yourself before adding it. |
 | `ahd-figma` (ai-happy-design) | EVALUATE | Low (local-only) | Go binary, local WebSocket. ~27 ops/sec batch claim (the project's claim, not measured here). Not tested in this canon. |
 | Anima Buddy | EVALUATE | Low (plugin-sandboxed) | Plugin-based, not a true MCP. Not tested in this canon. |
 | Any unofficial without audit | BANNED | Unknown | Default deny. |
 | Any MCP requiring a `0.0.0.0` bind | BANNED | Critical | Local network exposure. |
 
-RISKY sits outside the four tiers: the CVE is patched, but the server has had no further audit. The note in its row is the rule: avoid it for enterprise work, and evaluate it like any other server before adding it to settings.
+RISKY sits outside the four tiers: the CVE is patched, but the server has had no further audit. The note in its row is the rule: avoid it for enterprise work, and evaluate it like any other server before adding it to settings. UNVERIFIED also sits outside the tiers: this canon has no evidence either way, so the default deny applies until someone evaluates the project.
 
 **Decision rule:** `figma-console` over the Desktop Bridge (WebSocket on `127.0.0.1:9223-9232`, local-only transport) is the write path for every project. Treat it as your own code, not as an audited vendor. The official Figma MCP server is the fallback when the Bridge is down: for reads, and for writes through `use_figma` (Full seat required, see hard rule 5 in this skill's `SKILL.md`). Its tool calls are metered by plan (see "Rate limits per plan"). Anything else: evaluate before adding it to settings, and never add a third-party MCP that requires shell-quoted user input without input escaping.
 
@@ -70,6 +70,14 @@ When in doubt:
 - **NEVER expose it beyond localhost**
 - On Windows: no portproxy mapping `0.0.0.0:3845 -> 127.0.0.1:3845`
 - Check (macOS): `lsof -i :3845` should show only a loopback-bound process
+
+## Local servers the agent starts
+
+Two recipes in this canon have the agent start a short-lived local HTTP server: the CORS image server and the export-to-disk server in `references/plugin-api-data.md`. Neither ships in this repository. Rules for both:
+
+- Bind loopback only: `::1`, or `127.0.0.1` where `localhost` resolves only there. Never `::` or `0.0.0.0`: they listen on every interface, the same exposure as the `0.0.0.0` row in the third-party matrix.
+- `Access-Control-Allow-Origin: *` is required, because Figma documents that plugin iframes have a `null` origin. It also lets any web page open in the browser reach the port, so start the server for the task and stop it when the task is done.
+- A server that writes files keeps only the basename of the requested name, accepts one extension (`.png`) and checks the bytes before writing into one folder.
 
 ## DNS rebinding risk
 

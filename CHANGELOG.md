@@ -4,6 +4,33 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-10-05
+
+### Security
+
+- `daemon.mjs`, the opt-in `mcp-direct` daemon of `figma-bridge-doctor`, asks npm for its cache through `execFileSync` with a fixed argument list and no shell, instead of `execSync` with a command string. Cisco skill scanner 2.0.14 (`--policy balanced`) reported that line as CRITICAL `COMMAND_INJECTION_JS_CHILD_PROCESS`; after the change it reports 0 critical and 0 high findings.
+- `daemon.mjs` no longer sends error text to the HTTP client (CodeQL `js/stack-trace-exposure`). The client gets a fixed message per failure class, and the detail goes to the daemon's stderr. The `mcp-direct` README describes both changes.
+- The local server recipes for loading images and saving exports (`plugin-api-data.md`, `plugin-api-anomalies.md`, `figma-comment-fix-loop`) bind `::1`, or `127.0.0.1` where `localhost` resolves only there, instead of `::`, which listens on every interface. The export server now comes as code in `plugin-api-data.md`: it keeps only the basename of `name`, accepts only `.png` names and PNG bytes, and writes into one folder. `Access-Control-Allow-Origin: *` stays, with its reason: Figma documents that plugin iframes have a `null` origin. `security-canon.md` gains a section on local servers the agent starts, and `PRIVACY.md` mentions the recipe.
+
+### Fixed
+
+- Two field notes contradicted `@figma/plugin-typings` 1.140.0. They are qualified, not removed: writes under a locked ancestor that did not take, and `setTimeout` that did not fire. Each now says it was seen through the figma-console bridge (`figma_execute`), quotes what the typings say, and gives the cause as not established. `figma-preflight`, `docs/gotchas.md`, `llms.txt` and both READMEs carry the same qualification. Both note headings, and so their anchors, changed.
+- Both READMEs: the 14 unplanted items describe 13 distinct problems (both checks flagged the same rename); the test ran on a live Figma file built for the test; the M8ven entry is described as it is (claimed by the author, public grade C (Emerging), code sub-score 100 read on 2026-10-04 at commit 1dca321); each install route says where it ran from (GitHub main at 5afe295, the v1.1.0 release, GitHub, or a local copy).
+- `docs/works-with.md`: "Demo run" no longer says "end to end". It counts what did not run as written (19 skill steps in the audit, 3 of the 8 preflight checks in the fix) and says detector 8 changed after the run. The READMEs and `llms.txt` say the same.
+- The 1.1.0 entry below gives the limits of the 10 of 10 result in the same sentence.
+- `fetch_comments.py` handles a read timeout and an answer that is not JSON, and prints the first 300 bytes of an HTTP error body, never the headers. Exit codes: 1 HTTP error, 2 usage or no token, 3 network error or timeout, 4 not JSON. Tests cover each branch without network.
+- `security-canon.md`: `talktofigma` moves from BANNED/High, which cited no advisory, to UNVERIFIED (not evaluated here). The default deny still applies.
+
+### Changed
+
+- `figma-comment-fix-loop` lists the exit codes of `fetch_comments.py` and says to keep `comments-raw.json` out of git, because it holds commenter handles.
+- Portuguese README: phrases that read as translations are rewritten ("Para começar", "O que dá errado, e qual skill pega", "Dá para usar na biblioteca do time", "um checklist", "reserva o arquivo com um lock"). The "Para começar" anchor changed.
+- The README gotcha list starts with the gotchas that agree with Figma's docs and keeps one qualified field note.
+- `scripts/release_notes.py` checks every JSON manifest with a version field and the version line of `llms.txt`, as its docstring says. `scripts/build_dist.py` says that six of the per-skill zips need `figma-canon` installed next to them.
+- `AGENTS.md`: a "Cutting a release" section, ending with "never move a tag; ship the next patch".
+- `.codexignore`: the first comment says scanners read it and Codex CLI 0.156.1 copies the whole repository regardless.
+- Version 1.1.1 in every manifest, every `SKILL.md`, `CITATION.cff` and `llms.txt`.
+
 ## [1.1.0] - 2026-10-05
 
 ### Added
@@ -13,7 +40,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Manifests for more agents, all at 1.1.0 with one shared description: a root `plugin.json` (Agent Plugins 1.0.0), `.codex-plugin/plugin.json` for Codex, `.cursor-plugin/plugin.json` for Cursor, `gemini-extension.json` for Gemini CLI and `skills.sh.json` for the skills.sh page groupings. The Codex, Copilot CLI and Gemini CLI installs were run from a local copy; Cursor was not tested.
 - `docs/gotchas.md` ("Why does my agent...?"): every gotcha indexed by the symptom a designer sees, plus an index by literal error message. It links to the notes and never restates a fix.
 - `docs/landscape.md`: a dated map of the Figma MCP servers, skill sets and catalogs, and how these skills compose with Figma's own.
-- `docs/works-with.md`: which Figma connection each skill needs and how far each pair has been tested, with the blind demo on the official Figma MCP server (10 of 10 planted defects found).
+- `docs/works-with.md`: which Figma connection each skill needs and how far each pair has been tested, with the blind demo on the official Figma MCP server (10 of 10 planted defects found, on one demo screen in one run; the agent that planted the defects had read the skills, and the auditor's prompt named the properties to inspect).
 - A `compatibility` field in every `SKILL.md`, stating only real requirements.
 - Security text inside the skills: a Trust boundary section in `figma-canon`, an Untrusted input rule in `figma-orient` and `figma-comment-fix-loop`, and a "What it can change on your machine" section that opens `figma-bridge-doctor`.
 - `figma-orient` accepts the official Figma MCP server as a read path, with a call budget.

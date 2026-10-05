@@ -16,7 +16,7 @@ compatibility: >-
   skill. The optional local evidence script of figma-bridge-doctor is macOS only.
 metadata:
   author: Thiago Xikota
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # figma-preflight
@@ -310,11 +310,12 @@ After the preflight OK, BEFORE generating any JS for `figma_execute` (or `use_fi
    precheck hook (`hooks/figma-canon-precheck.py` at the root of the figma-maxxing repo, opt-in)
    flags these patterns. If it fires:
    read the message, fix it at the source, do NOT retry blindly.
-4. **`locked` is not inherited as a property, but it IS inherited as behavior (field note,
-   2026-08).** A node with `locked: false` whose ANCESTOR is `locked: true` refuses the write
-   **silently**, and the setter raises no error. In a write that sweeps a tree, check the chain
-   (`for (let p=n; p; p=p.parent) if (p.locked) ...`), not only the target. In one large batch, a
-   handful of binds were phantoms.
+4. **Check the ancestor chain for `locked` (field note, 2026-08).** In one large bind sweep
+   through the figma-console bridge, a handful of binds under a GROUP with `locked: true` did not
+   take, with no error, while each node read `locked: false`. Figma's typings say `locked` does
+   not affect plugin writes, and the cause is not established. The check is cheap: in a write that
+   sweeps a tree, check the chain (`for (let p=n; p; p=p.parent) if (p.locked) ...`), not only the
+   target, and rely on the read-back in rule 5 either way.
 5. **Post-write verification reads the PROPERTY YOU CHANGED, never a proxy.** In that same batch
    the read-back checked color and opacity and came back green on the nodes that were never
    written: color and opacity really had not changed, precisely because nothing happened. If you

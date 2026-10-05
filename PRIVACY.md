@@ -23,7 +23,7 @@ Delete any of these at any time. Nothing else depends on them.
 
 ## Network
 
-The skills, the hook, the installer and the bridge scripts connect only to `127.0.0.1`: the `mcp-direct` clients (`fx.py`, `shot.py`) talk to their local daemon. That daemon, the only listener in this repository, binds `127.0.0.1` and nothing else.
+The skills, the hook, the installer and the bridge scripts connect only to `127.0.0.1`: the `mcp-direct` clients (`fx.py`, `shot.py`) talk to their local daemon. That daemon, the only listener in this repository, binds `127.0.0.1` and nothing else. Two recipes in `figma-canon` have the agent write and start a short-lived local server to load images or save exports; it is not shipped here, it binds loopback only (`::1` or `127.0.0.1`), and it stops when the task is done.
 
 One maintainer script is the exception. `scripts/check_api.py`, which CI and contributors run to check Plugin API names, downloads the pinned `@figma/plugin-typings` from registry.npmjs.org and verifies its sha512. It is not part of the skills or the plugin, and it sends nothing about you.
 

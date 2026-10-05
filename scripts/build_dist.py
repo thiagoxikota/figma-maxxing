@@ -8,13 +8,17 @@ same zips: entries are sorted, timestamps are fixed at 1980-01-01, and file mode
   dist/<skill>-<version>.zip          <skill>/SKILL.md at the root, plus <skill>/LICENSE.
                                        Upload it as a custom skill in claude.ai, or unzip it
                                        into a skills folder (~/.claude/skills, .agents/skills).
+                                       It is not self-contained: six skills (preflight, orient,
+                                       slop-check, handoff-gate, comment-fix-loop, click-flow)
+                                       link to ../figma-canon/references/, so install
+                                       figma-canon-<version>.zip next to them.
   dist/figma-maxxing-<version>.zip    the plugin layout under figma-maxxing-<version>/: skills,
                                        hooks, .claude-plugin, install.py and the docs.
   dist/SHA256SUMS                     sha256sum format, for `sha256sum -c SHA256SUMS`.
 
 Usage:
   python3 scripts/build_dist.py                  # HEAD into dist/
-  python3 scripts/build_dist.py --ref v1.1.0     # any commit or tag
+  python3 scripts/build_dist.py --ref v1.1.1     # any commit or tag
   python3 scripts/build_dist.py --out /tmp/out   # another output folder
 """
 from __future__ import annotations

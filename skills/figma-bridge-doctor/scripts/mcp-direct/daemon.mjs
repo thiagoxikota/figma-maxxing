@@ -21,7 +21,7 @@
 //      file is removed when the daemon exits. fx.py and shot.py read it from there.
 // Any process running as the same user can still read the token file. Stop the daemon when
 // the work is done.
-import { spawn, execSync } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import http from 'node:http';
 import {
@@ -37,11 +37,14 @@ const SERVER = process.env.FIGMA_MCP_ENTRY || (() => {
   // version; field note, 2026-09), its server rewrote ~/.figma-console-mcp/plugin/ with the
   // old bundle, and the plugin in Figma started announcing "update available". Sort by SEMVER.
   // npm exports npm_config_cache to the processes it starts; read it first and ask npm only
-  // when it is absent. Set FIGMA_MCP_ENTRY to skip this lookup entirely.
+  // when it is absent. npm runs through execFileSync with a fixed argument list and no shell.
+  // Set FIGMA_MCP_ENTRY to skip this lookup entirely.
   let npmCache = process.env.npm_config_cache || '';
   if (!npmCache) {
     try {
-      npmCache = execSync('npm config get cache', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+      npmCache = execFileSync('npm', ['config', 'get', 'cache'], {
+        encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 15000,
+      }).trim();
     } catch { /* npm not on PATH: fall back to npm's default cache dir */ }
   }
   if (!npmCache) npmCache = join(homedir(), '.npm');
@@ -115,6 +118,13 @@ function refusal(req) {
     return [401, 'missing or wrong bearer token: read it from <state-dir>/mcp-direct-<HTTP_PORT>.token'];
   }
   return null;
+}
+
+// A fixed message per failure class, so no error text or stack trace reaches the client.
+function clientError(e) {
+  if (e instanceof SyntaxError) return 'request body is not valid JSON';
+  if (e instanceof Error && e.message.startsWith('timeout ')) return 'the figma-console server did not answer in time';
+  return 'internal error: the detail is in the daemon log (stderr)';
 }
 
 // The Figma token is not read here: FIGMA_ACCESS_TOKEN reaches the server through the
@@ -195,8 +205,10 @@ const server = http.createServer((req, res) => {
       res.writeHead(200, { 'content-type': 'application/json' });
       res.end(JSON.stringify(r.result ?? r.error ?? r));
     } catch (e) {
+      // The detail stays in this daemon's stderr; the client only gets a fixed message.
+      console.error('mcp-direct: request failed:', e);
       res.writeHead(500, { 'content-type': 'application/json' });
-      res.end(JSON.stringify({ error: String(e && e.message || e) }));
+      res.end(JSON.stringify({ error: clientError(e) }));
     }
   });
 });

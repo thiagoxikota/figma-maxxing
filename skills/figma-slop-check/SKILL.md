@@ -16,7 +16,7 @@ compatibility: >-
   skill was not validated there. Reads the figma-canon skill.
 metadata:
   author: Thiago Xikota
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # figma-slop-check

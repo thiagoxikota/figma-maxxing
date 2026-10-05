@@ -17,7 +17,7 @@ compatibility: >-
   figma-preflight, figma-orient and figma-bridge-doctor.
 metadata:
   author: Thiago Xikota
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # figma-comment-fix-loop
@@ -48,7 +48,9 @@ The Plugin API cannot read comments. Comments are read through the REST API, or 
   python3 "${CLAUDE_SKILL_DIR}/scripts/fetch_comments.py" <fileKey> comments-raw.json
   ```
 
-  Other agents: the script sits in `scripts/` next to this file.
+  Other agents: the script sits in `scripts/` next to this file. Exit codes: `1` the API answered with an HTTP error (the script prints the first 300 bytes of the body), `2` usage or no token, `3` network error or timeout, `4` the answer was not JSON. Run it again once at most; do not loop.
+
+  `comments-raw.json` holds every commenter's handle and avatar URL. Keep it out of git: write it to a folder your `.gitignore` covers, and never commit it.
 
 - File that belongs to ANOTHER account: a personal access token and the OAuth session of the official Figma MCP server both return 404, and the Plugin API cannot read comments. The token has no access to the file. Ask the user to paste the comments: every open one, with its author, its text and the frame it is pinned on. Pasted comments carry no `client_meta`, so the frame and the pinned element come from the user.
 - The user pasted only ONE comment? It still triggers a FULL round: pull the whole open set before touching anything. One pasted comment is a symptom of a fresh review (field note, 2026-07: 1 pasted comment, 8 open ones from the same hour, including a sibling asking for the SAME color fix on another element). Fixing only the pasted one is guaranteed rework.
@@ -93,7 +95,7 @@ Folder `<project>/<stakeholder>-review-<date>/`, where `<project>` is the folder
 
 - Export: a local save server (on a free port in the 9223 to 9232 range) OR REST `/v1/images` with a freshness PROBE before the batch. The cloud lags behind the canvas, and a stale export has already produced a false "still broken" twice.
   - Freshness probe: export one node you just changed, read the PNG and confirm the change is visible before you export the batch. If it is stale, wait about 20 s and probe again. Do not re-edit a canvas that is already correct. The stale render behavior, and how to validate an exported file before trusting it, is in [`figma-canon/references/plugin-api-anomalies.md`](../figma-canon/references/plugin-api-anomalies.md) ("REST /v1/images renders stale cloud state after plugin edits").
-  - Save server: this repo does not ship it, so write a small one. Inside `figma_execute`, export each node with `node.exportAsync` and POST the bytes to `http://localhost:<port>/?name=<file>.png`. The server must accept that POST, send `Access-Control-Allow-Origin: *` and bind IPv6 on `::`. The plugin must fetch `localhost`: `127.0.0.1` fails with "Failed to fetch". Pick a port in 9223 to 9232 that the Desktop Bridge is not using. The full recipe is the export-to-disk pipeline in [`figma-canon/references/plugin-api-anomalies.md`](../figma-canon/references/plugin-api-anomalies.md) ("Plugin export as REST 429 bypass").
+  - Save server: this repo does not ship it, so start the short one in [`figma-canon/references/plugin-api-data.md`](../figma-canon/references/plugin-api-data.md) ("Export-to-disk server (POST)"). Inside `figma_execute`, export each node with `node.exportAsync` and POST the bytes to `http://localhost:<port>/?name=<file>.png`. The server sends `Access-Control-Allow-Origin: *` (plugin iframes have a `null` origin), binds the loopback address only (`::1`, or `127.0.0.1` where `localhost` resolves only there; never `::` or `0.0.0.0`), keeps only the basename of `name` and accepts only `.png` names and PNG bytes. The plugin must fetch `localhost`: `127.0.0.1` in the URL fails with "Failed to fetch". Pick a port in 9223 to 9232 that nothing is listening on, and stop the server when the export is done. The pipeline is in [`figma-canon/references/plugin-api-anomalies.md`](../figma-canon/references/plugin-api-anomalies.md) ("Plugin export as REST 429 bypass").
 - Evidence of position or of a section title: only a `screencapture` of the real canvas works (a section export does not include the label). This part is macOS only. Bringing Figma to the front steals focus from the designer, so tell them before you do it.
   1. If another window (the code editor, for example) is on top of Figma, activate Figma and raise its window 1: `osascript -e 'tell application "Figma" to activate' -e 'tell application "System Events" to perform action "AXRaise" of window 1 of process "Figma"'`. The System Events call needs the Accessibility permission described in `figma-bridge-doctor`.
   2. Confirm Figma is frontmost: `osascript -e 'tell application "System Events" to get name of first process whose frontmost is true'` must print `Figma`.

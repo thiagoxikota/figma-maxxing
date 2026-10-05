@@ -14,7 +14,7 @@ observations stand.
 **Sandbox and timeouts**
 
 - [Sequential `await loadFontAsync` in a loop hangs the sandbox](#sequential-await-loadfontasync-in-a-loop-hangs-the-sandbox): the script hangs after 5 to 7 font loads.
-- [`setTimeout` never fires in the plugin sandbox](#settimeout-never-fires-in-the-plugin-sandbox): a `Promise.race` timeout guard protects nothing.
+- [`setTimeout` did not fire through the figma-console bridge](#settimeout-did-not-fire-through-the-figma-console-bridge): a `Promise.race` timeout guard protected nothing. Figma's typings declare `setTimeout`; cause not established.
 - [`createAutoLayout`, `node.query` and `node.set` are not Plugin API](#createautolayout-nodequery-and-nodeset-are-not-plugin-api): `TypeError: not a function`.
 - [`getRangeAllFontNames` in a loop hangs the sandbox](#getrangeallfontnames-in-a-loop-hangs-the-sandbox): a text script dies on the third node.
 - [A script that runs past the execute ceiling freezes the sandbox for every session](#a-script-that-runs-past-the-execute-ceiling-freezes-the-sandbox-for-every-session): the bridge stops answering for everyone.
@@ -53,7 +53,7 @@ observations stand.
 
 - [A SECTION fill bound to a variable renders the base color you passed](#a-section-fill-bound-to-a-variable-renders-the-base-color-you-passed): new sections render black.
 - [`setBoundVariableForPaint` drops paint opacity: bind first, set opacity after](#setboundvariableforpaint-drops-paint-opacity-bind-first-set-opacity-after): a tinted chip turns solid.
-- [Writes to descendants of a locked node fail silently](#writes-to-descendants-of-a-locked-node-fail-silently): a few binds out of thousands do not take.
+- [Writes under a locked ancestor did not take through the figma-console bridge](#writes-under-a-locked-ancestor-did-not-take-through-the-figma-console-bridge): a few binds out of thousands did not take. Figma's typings say `locked` does not block plugin writes; cause not established.
 - [Contrast per mode: resolve both colors through their bindings](#contrast-per-mode-resolve-both-colors-through-their-bindings): a pair passes in light mode and fails in dark mode.
 
 **Images**
@@ -104,11 +104,18 @@ observations stand.
 
 (field note, 2026-09)
 
-## `setTimeout` never fires in the plugin sandbox
+## `setTimeout` did not fire through the figma-console bridge
 
-- **Symptom:** a timeout guard built with `Promise.race` plus `setTimeout` protects nothing.
-- **Cause:** `setTimeout` does not fire in the plugin sandbox reached through the bridge.
-- **Fix:** do not use `setTimeout`. Keep each script short instead: one or two screens per call.
+- **Symptom:** a timeout guard built with `Promise.race` plus `setTimeout` protected nothing in a
+  `figma_execute` script.
+- **Where:** the figma-console bridge (`figma_execute`) only. Not tried on `use_figma` or in a
+  regular plugin.
+- **Figma's docs say otherwise:** `@figma/plugin-typings` 1.140.0 declares `setTimeout` as a
+  global (`index.d.ts`), uses it in the `saveVersionHistoryAsync` example, and says
+  `figma.closePlugin()` cancels pending `setTimeout` timers. Both observations stand.
+- **Cause:** not established.
+- **Fix:** do not count on `setTimeout` as a timeout guard in `figma_execute`. Keep each script
+  short instead: one or two screens per call.
 
 (field note, 2026-09)
 
@@ -509,15 +516,21 @@ detector.
 
 (field note, 2026-09)
 
-## Writes to descendants of a locked node fail silently
+## Writes under a locked ancestor did not take through the figma-console bridge
 
 - **Symptom:** in a large bind sweep, a handful of binds did not take. All of them were descendants of a
   GROUP with `locked: true`, while each node itself reported `locked: false`.
   `setBoundVariableForPaint` returned a paint normally, with no error.
-- **Cause:** `locked` is not inherited as a property, but it IS inherited as behavior. Checking
-  `n.locked` on the target passes. The editor still refuses the write, with no exception.
+- **Where:** one sweep through the figma-console bridge (`figma_execute`). Not reproduced since,
+  and not tried on `use_figma`.
+- **Figma's docs say otherwise:** `@figma/plugin-typings` 1.140.0, on `locked`: "Does not affect
+  a plugin's ability to write to those properties." The same doc says a node counts as locked
+  when it or any parent has `locked: true`. Both observations stand.
+- **Cause:** not established. The failed binds and the locked ancestor were seen together in one
+  sweep; the note does not show that the lock caused the failures.
 - **Fix:** before writing, check the ancestor chain for `locked`, not only the node:
-  `for (let p=n; p; p=p.parent) if (p.locked) ...`.
+  `for (let p=n; p; p=p.parent) if (p.locked) ...`. Then read back what you wrote (the detector
+  below): the read-back catches a write that did not take, whatever the cause.
 - **Detector:** the post-write check must read THE THING THAT CHANGED (does
   `boundVariables[prop][i]` exist now?), never a proxy. A read-back that compared color and
   opacity passed on the 11 failures, because those values did not change precisely when nothing

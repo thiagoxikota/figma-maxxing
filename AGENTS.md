@@ -76,13 +76,24 @@ The tests catch some of these patterns. They cannot catch a name, so check your 
 
 ## Version and changelog
 
-The version lives in `.claude-plugin/plugin.json`. Keep every other copy equal to it: `metadata.version` in each `SKILL.md`, `version` in `CITATION.cff`, and any other manifest that carries one. The marketplace entry carries no version. The project follows semantic versioning:
+The version lives in `.claude-plugin/plugin.json`. Keep every other copy equal to it: `metadata.version` in each `SKILL.md`, `version` in `CITATION.cff`, the "Version x.y.z." line of `llms.txt`, and any other manifest that carries one. The marketplace entry carries no version. `scripts/release_notes.py` and the tests read every one of these. The project follows semantic versioning:
 
 - **Patch** (1.1.0 to 1.1.1): a rule corrected, a typo, a script bug fixed with no change in what users run.
 - **Minor** (1.1.0 to 1.2.0): new gotchas, checks, references, optional scripts or manifests.
 - **Major** (1.x to 2.0): a skill renamed or removed, an install command or path changed, or a script default changed in a way that can surprise someone (for example, a reset that quits Figma without asking).
 
 Every change a user could notice gets a line under `## [Unreleased]` in `CHANGELOG.md`, in the Keep a Changelog groups (Added, Changed, Fixed, Security). On release the maintainer moves those lines under the new version, bumps the version fields and sets `date-released` in `CITATION.cff`. Agents do not tag, push or publish.
+
+## Cutting a release
+
+The maintainer does this. An agent stops at a working tree where the checks pass.
+
+1. Set the new version in every field listed above: `.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`, `.cursor-plugin/plugin.json`, the root `plugin.json`, `gemini-extension.json`, each `SKILL.md`, `CITATION.cff` and `llms.txt`.
+2. In `CHANGELOG.md`, move the `## [Unreleased]` lines under `## [x.y.z] - YYYY-MM-DD` and add the `[x.y.z]:` link at the bottom. Set `date-released` in `CITATION.cff` to the same date.
+3. Run `python3 scripts/release_notes.py x.y.z`. It exits 1 when any version field differs or the CHANGELOG section is missing, and prints the release notes otherwise. Run the three checks under Commands too.
+4. Commit and push, then tag that commit and push the tag: `git tag vx.y.z` and `git push origin vx.y.z`.
+5. `release.yml` runs on the `v*` tag. It reruns `release_notes.py`, the tests, `check_api.py --strict` and `count_claims.py --check`, builds the zips twice with `build_dist.py` and compares the bytes, attaches a build provenance attestation, and creates the GitHub release with the CHANGELOG section as its notes.
+6. Never move a tag: the ruleset on `v*` tags blocks deleting or updating one. If a release ships wrong, ship the next patch. The release body stays editable.
 
 ## Style
 
