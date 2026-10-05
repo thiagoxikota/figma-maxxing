@@ -78,4 +78,5 @@ First public release.
 - `figma-bridge-doctor` asks before any step that quits Figma Desktop, and its reset script never quits Figma unless `FIGMA_FULL_RESET=1` is set. Without asking, it kills only orphan servers.
 - The advisory file lock uses an OS file lock, so a crashed session never leaves the lock directory blocked.
 
+[1.1.0]: https://github.com/thiagoxikota/figma-maxxing/releases/tag/v1.1.0
 [1.0.0]: https://github.com/thiagoxikota/figma-maxxing/releases/tag/v1.0.0

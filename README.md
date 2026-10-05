@@ -181,10 +181,10 @@ Ran with Copilot CLI 1.0.61.
 <summary><b>Gemini CLI</b></summary>
 
 ```bash
-gemini extensions install https://github.com/thiagoxikota/figma-maxxing --ref main
+gemini extensions install https://github.com/thiagoxikota/figma-maxxing
 ```
 
-Ran with Gemini CLI 0.43.0. It asks you to trust the folder and to confirm the install; `--consent` answers both, which is how the test ran. `--ref main` is needed because Gemini installs the latest GitHub release first, and the v1.0.0 release has no Gemini manifest.
+Ran with Gemini CLI 0.43.0, which installed 1.1.0 from the latest GitHub release. It asks you to trust the folder and to confirm the install; `--consent` answers both, which is how the test ran.
 
 </details>
 
