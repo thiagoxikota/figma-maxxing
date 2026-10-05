@@ -1,0 +1,17 @@
+<!doctype html>
+<!-- Source of assets/icon.png: the square mark for marketplaces and directories (512 x 512).
+     "Fm" in Sora with the red swatch from the banner as its full stop. Full-bleed square, no transparency,
+     so a host can apply its own corner radius or circle mask; the mark stays inside the middle 75%.
+     Fonts (SIL Open Font License, from Google Fonts): put Sora.ttf next to this file.
+     Render at 512 x 512, scale 1, and check it at 64 x 64. -->
+<html><head><meta charset="utf-8">
+<style>
+@font-face { font-family: Sora; src: url(Sora.ttf); font-weight: 100 800; }
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 512px; height: 512px; background: #0B0C11; overflow: hidden; }
+body { display: flex; align-items: center; justify-content: center; }
+.g { display: flex; align-items: baseline; font-family: Sora; font-weight: 800; font-size: 232px; line-height: 1;
+     letter-spacing: -0.06em; color: #E8E4DC; margin-top: 12px; margin-left: -16px; }
+.dot { display: inline-block; width: 50px; height: 50px; border-radius: 11px; background: #DC000C; margin-left: 14px; flex: none; }
+</style></head>
+<body><div class="g">Fm<span class="dot"></span></div></body></html>

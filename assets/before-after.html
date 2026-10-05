@@ -1,0 +1,68 @@
+<!doctype html>
+<!-- Source of assets/demo/before-after-light.png and before-after-dark.png.
+     The two phone images are real 1x screenshots (get_screenshot, official Figma MCP, 2026-10-05) of a
+     demo file built for a blind test, cropped to remove the status bar and the blank space below the content.
+     The punch list items the markers point at live as text in README.md, so they read at any width and
+     can be translated; this image carries only the screens, the markers and the two figma-slop-check counts.
+     Fonts (SIL Open Font License, from Google Fonts): put Sora.ttf and JetBrainsMono.ttf next to this file.
+     Render at 1040 x 980, scale 1, with ?theme=light and ?theme=dark. -->
+<html><head><meta charset="utf-8">
+<style>
+@font-face { font-family: Sora; src: url(Sora.ttf); font-weight: 100 800; }
+@font-face { font-family: Mono; src: url(JetBrainsMono.ttf); font-weight: 100 800; }
+:root { --bg:#0B0C11; --ink:#E8E4DC; --line:#2B2D3C; --signal:#DC000C; --signal-ink:#FF6B5E; }
+:root[data-theme="light"] { --bg:#E8E4DC; --ink:#161722; --line:#C9C3B6; --signal:#DC000C; --signal-ink:#9A060D; }
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 1040px; height: 980px; background: var(--bg); color: var(--ink); overflow: hidden; font-family: Sora; }
+.col { position: absolute; top: 44px; width: 390px; }
+.label { font-family: Mono; font-weight: 700; font-size: 38px; height: 52px; display: flex; align-items: center; letter-spacing: -0.02em; }
+.phone { position: relative; width: 390px; height: 682px; margin-top: 18px; }
+.phone img { width: 100%; height: 100%; display: block; border-radius: 24px; border: 2px solid var(--line); }
+.phone svg { position: absolute; left: -100px; top: 0; width: 600px; height: 682px; overflow: visible; }
+.m { position: absolute; transform: translate(-50%, -50%); width: 54px; height: 54px; border-radius: 27px;
+     background: var(--signal); color: #fff; font-family: Mono; font-weight: 800; font-size: 36px; line-height: 1;
+     display: flex; align-items: center; justify-content: center; }
+.count { margin-top: 26px; font-weight: 700; font-size: 56px; letter-spacing: -0.03em; line-height: 1.05; }
+.sev { margin-top: 8px; font-size: 38px; letter-spacing: -0.015em; line-height: 1.1; }
+.sev b { color: var(--signal-ink); font-weight: 700; }
+</style></head>
+<body>
+<div class="col" style="left: 100px">
+  <div class="label">Before</div>
+  <div class="phone" id="before"><img src="demo/frames/before.png" alt=""></div>
+  <p class="count">16 findings</p>
+  <p class="sev"><b>4 critical</b></p>
+</div>
+<div class="col" style="left: 610px">
+  <div class="label">After</div>
+  <div class="phone"><img src="demo/frames/after.png" alt=""></div>
+  <p class="count">6 findings</p>
+  <p class="sev"><b>1 critical</b></p>
+</div>
+<script>
+document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || 'dark';
+// The counts are the Summary lines of the figma-slop-check runs before and after the fix pass.
+// Callouts in screenshot pixels (390 x 682 crop): [punch list item, target x, target y, marker x, marker y].
+// Markers sit outside the screenshot and a line runs to the layer the item names.
+const callouts = [
+  [6, 13, 27, -46, 22], [4, 12, 53, -46, 84], [7, 14, 57, -46, 146], [8, 19, 156, -46, 208], [5, 18, 333, -46, 333],
+  [3, 272, 98, 432, 50], [2, 372, 540, 432, 530], [1, 307, 577, 432, 600],
+];
+const before = document.getElementById('before');
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.createElementNS(NS, 'svg');
+before.appendChild(svg);
+for (const [n, tx, ty, mx, my] of callouts) {
+  const line = document.createElementNS(NS, 'line');
+  Object.entries({ x1: mx + 100, y1: my, x2: tx + 100, y2: ty, stroke: '#DC000C', 'stroke-width': 3.5 }).forEach(([k, v]) => line.setAttribute(k, v));
+  svg.appendChild(line);
+  const dot = document.createElementNS(NS, 'circle');
+  Object.entries({ cx: tx + 100, cy: ty, r: 7, fill: '#DC000C', stroke: '#fff', 'stroke-width': 2.5 }).forEach(([k, v]) => dot.setAttribute(k, v));
+  svg.appendChild(dot);
+  const el = document.createElement('span');
+  el.className = 'm'; el.textContent = n;
+  el.style.left = mx + 'px'; el.style.top = my + 'px';
+  before.appendChild(el);
+}
+</script>
+</body></html>

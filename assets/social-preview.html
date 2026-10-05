@@ -1,0 +1,36 @@
+<!doctype html>
+<!-- Source of assets/social-preview.png (GitHub Settings > Social preview, 1280 x 640, under 1 MB).
+     The two crops are the top of real 1x screenshots (get_screenshot, official Figma MCP, 2026-10-05) of a demo
+     file built for a blind test: the same screen before and after the fix pass.
+     Fonts (SIL Open Font License, from Google Fonts): put Sora.ttf and JetBrainsMono.ttf next to this file.
+     Render at 1280 x 640, scale 1. No counts on this image: they go stale. -->
+<html><head><meta charset="utf-8">
+<style>
+@font-face { font-family: Sora; src: url(Sora.ttf); font-weight: 100 800; }
+@font-face { font-family: Mono; src: url(JetBrainsMono.ttf); font-weight: 100 800; }
+:root { --bg:#0B0C11; --ink:#E8E4DC; --line:#2B2D3C; --signal-ink:#FF6B5E; }
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 1280px; height: 640px; background: var(--bg); color: var(--ink); overflow: hidden; font-family: Sora; }
+.wrap { display: grid; grid-template-columns: 1fr 400px; gap: 40px; align-items: center; height: 100%; padding: 0 64px; }
+h1 { font-weight: 700; font-size: 60px; line-height: 1.04; letter-spacing: -0.035em; }
+.name { font-family: Mono; font-weight: 700; font-size: 48px; margin-top: 44px; color: var(--signal-ink); letter-spacing: -0.02em; }
+.what { font-size: 48px; line-height: 1.16; letter-spacing: -0.02em; margin-top: 6px; }
+.shot { font-family: Mono; font-weight: 700; font-size: 48px; line-height: 1; margin-bottom: 12px; letter-spacing: -0.02em; }
+.crop { width: 400px; height: 171px; border-radius: 18px; border: 2px solid var(--line); background-size: 400px auto; background-position: 0 0; }
+.crop + .shot { margin-top: 30px; }
+</style></head>
+<body>
+<div class="wrap">
+  <div>
+    <h1>A screen can look right<br>while the file is wrong.</h1>
+    <p class="name">figma-maxxing:</p>
+    <p class="what">agent skills for real<br>Figma files</p>
+  </div>
+  <div>
+    <p class="shot">Before</p>
+    <div class="crop" style="background-image:url(demo/frames/before.png)"></div>
+    <p class="shot">After</p>
+    <div class="crop" style="background-image:url(demo/frames/after.png)"></div>
+  </div>
+</div>
+</body></html>

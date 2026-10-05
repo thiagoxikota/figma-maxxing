@@ -1,166 +1,272 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../assets/banner-dark.png">
-  <img alt="Figma Maxxing. Agent skills for real Figma files, by Thiago Xikota." src="../assets/banner-light.png">
+  <img alt="Figma Maxxing. Skills de agente para arquivos reais do Figma, por Thiago Xikota. Um preenchimento mostrado duas vezes: o hex solto #DC000C riscado e, embaixo, o token color/brand/signal. 8 skills, 90 gotchas." src="../assets/banner-light.png">
 </picture>
 
 # Figma Maxxing
 
-**Skills de agente para arquivos reais do Figma: inspecionar antes de editar, provar o que mudou e pegar as lacunas do handoff.**
+**Skills para agentes que trabalham em arquivos reais do Figma. O agente olha o arquivo antes de editar, confere o que mudou depois e aponta o que falta no handoff.**
 
-[![Tests](https://github.com/thiagoxikota/figma-maxxing/actions/workflows/test.yml/badge.svg)](https://github.com/thiagoxikota/figma-maxxing/actions/workflows/test.yml)
+8 skills · 90 gotchas · um gate de handoff com 17 checagens
+
+[![Test](https://github.com/thiagoxikota/figma-maxxing/actions/workflows/test.yml/badge.svg)](https://github.com/thiagoxikota/figma-maxxing/actions/workflows/test.yml)
+[![skills.sh](https://www.skills.sh/b/thiagoxikota/figma-maxxing)](https://www.skills.sh/thiagoxikota/figma-maxxing)
 [![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](../LICENSE)
 
-[English](../README.md) · [Instalar](#instalar) · [O que você precisa](#o-que-você-precisa) · [As skills](#as-skills) · [Gotchas](#alguns-dos-gotchas)
+**[English](../README.md)** · [Começo rápido](#começo-rápido) · [Instalar](#instalar-no-seu-agente) · [Skills](#as-skills) · [Gotchas](#alguns-gotchas)
 
-## Cole na sua IA
+## Começo rápido
 
-Você não precisa instalar nada para receber uma checklist do seu trabalho. Copie o texto abaixo, cole na IA que você usa (Claude, ChatGPT, Gemini, Cursor) e preencha os colchetes.
-
-```text
-Leia https://raw.githubusercontent.com/thiagoxikota/figma-maxxing/main/llms.txt
-Se não conseguir abrir, me avise e não invente.
-Sou designer. [Tenho / Não tenho] um agente de IA conectado ao Figma.
-Meu contexto: [plano do Figma, se meus arquivos têm design system, se trabalho
-sozinho ou em time]. Escolha no máximo cinco regras para o meu trabalho. Para
-cada uma, me dê uma checagem que eu consiga fazer no Figma hoje. Depois, diga se
-alguma skill vale a pena instalar no meu caso.
-```
-
-Se alguma regra te poupar uma tarde e você tiver conta no GitHub, deixe uma estrela. É assim que outros designers encontram o repositório.
-
-## Por que existe
-
-Sou o Thiago Xikota, AI Product Designer. Este é o conjunto de skills que eu uso quando um agente edita meus arquivos no Figma: arquivos que já têm design system, comentário do time e um dev esperando o handoff.
-
-A tela pode parecer certa e o arquivo estar errado. A cor está num hex solto, mesmo existindo uma variável igual. O ícone foi desenhado à mão porque ninguém procurou na biblioteca. O handoff mostra como adicionar e nunca como remover. Você só descobre quando clica na camada, ou quando o dev pergunta.
-
-Estas skills orientam o agente a inspecionar o arquivo antes de editar e a conferir o que mudou antes de dizer que terminou. A maior parte das regras nasceu de algo que quebrou num arquivo real.
-
-As skills estão escritas em inglês, para servir também a quem não fala português. Você conversa com o agente em português normalmente.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/flow-dark.png">
-  <img alt="Como as skills se encaixam: 01 mapear o arquivo com figma-orient, 02 conferir antes de editar com figma-preflight, 03 editar com figma_execute, 04 conferir depois com figma-slop-check, 05 entregar com figma-handoff-gate. O figma-canon guarda as regras que todo passo lê; o figma-comment-fix-loop roda os passos 02 a 04 uma vez por comentário." src="../assets/flow-light.png">
-</picture>
-
-## Instalar
+Instale as skills:
 
 ```bash
 npx skills add thiagoxikota/figma-maxxing
 ```
 
-Isso instala as skills no seu agente (Claude Code, Codex, Cursor e outros compatíveis com a [CLI `skills`](https://skills.sh)). A CLI é de terceiros e envia contagem anônima de instalação; `DISABLE_TELEMETRY=1` desliga. Isso não conecta o agente ao Figma: esse é [o próximo passo](#o-que-você-precisa).
+Conecte o agente ao Figma pelo servidor MCP oficial da Figma ou pelo figma-console-mcp ([como configurar](#o-que-você-precisa)). Depois cole o link de um frame e pergunte: "Esse frame tá pronto pra handoff?"
+
+Para isso, você precisa de um agente de código que carregue skills (Claude Code, Codex, Cursor, Copilot CLI ou Gemini CLI) e do Node.js para rodar o `npx`. A instalação no app do Claude, no desktop ou na web, ainda não foi testada. Nesse app, ou sem nenhum agente de código, [cole um prompt no chat](#cole-na-sua-ia) e receba uma checklist.
+
+Se alguma regra pegou um problema no seu arquivo, deixe uma estrela. É assim que outros designers encontram o projeto.
+
+## Antes e depois
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/demo/before-after-dark.png">
+  <img alt="A mesma tela de membros do time antes e depois das checagens. Os marcadores 1 a 8 na tela de antes apontam para as camadas que a lista abaixo cita. O figma-slop-check achou 16 problemas antes (4 críticos, 6 altos, 4 médios, 2 baixos) e 6 depois da correção (1 crítico, 2 médios, 3 baixos)." src="../assets/demo/before-after-light.png">
+</picture>
+
+**Teste às cegas no servidor MCP oficial da Figma, 05/10/2026: a auditoria achou os 10 defeitos plantados, nenhum ficou de fora.** Um agente montou uma tela de demonstração com 10 defeitos plantados e um gabarito. Outro, sem o gabarito, rodou o `figma-slop-check` e o `figma-handoff-gate`. Um terceiro comparou a auditoria com o gabarito. Fora isso, a auditoria apontou 14 problemas que ninguém plantou. Depois de uma passada de correção, o `figma-slop-check` caiu de 16 achados para 6, mas nenhuma das checagens passa ainda. Também tem uma [animação de 9 segundos](../assets/demo/demo.gif).
 
 <details>
-<summary>Outras formas de instalar</summary>
+<summary>Os marcadores, como o teste rodou e os limites dele</summary>
 
-**Plugin do Claude Code**
+Os marcadores apontam para os 8 primeiros itens da lista do `figma-slop-check`, traduzidos:
+
+1. **WCAG:** texto do card de upsell com contraste e tamanho abaixo do mínimo
+2. **NOMES:** nome padrão do Figma no card de upsell
+3. **NOMES:** nome padrão do Figma num divisor
+4. **NOMES:** nomes padrão do Figma no ícone de metadados
+5. **INSTÂNCIA:** cópia desanexada do ListItem
+6. **TOKEN:** título com hex solto
+7. **ÍCONE:** ícone de pessoa desenhado à mão no lugar do Icon/User
+8. **RAIO:** raio do card de resumo fora da escala
+
+Eu queria saber se as checagens acham problema de verdade, então montei um teste às cegas. Um agente criou uma tela de demonstração com 10 defeitos plantados e escreveu um gabarito. Outro agente, que nunca viu o gabarito, rodou o `figma-slop-check` e o `figma-handoff-gate` pelo servidor MCP oficial da Figma. O prompt dele também dizia o que inspecionar: variáveis vinculadas, instâncias e frames, espaçamento, raio, nomes e limites de texto. Um terceiro, o juiz, comparou a lista de problemas com o gabarito.
+
+**A auditoria achou os 10 defeitos plantados, nenhum pela metade, e nenhum passou batido.** A lista tinha 27 itens: 16 do `figma-slop-check` e 11 do `figma-handoff-gate`. Desses, 13 batem com algum defeito plantado (alguns defeitos aparecem em mais de um item). Os outros 14 são problemas que ninguém plantou. Nenhum deles é desmentido pelo gabarito nem pelas capturas, mas 2 só poderiam ser conferidos abrindo o arquivo, e o juiz não abriu. Um dos 14 é uma falha de contraste que nem o gabarito tinha pegado.
+
+Depois, um quarto agente rodou o `figma-preflight`, corrigiu a tela e releu cada propriedade que mudou. O `figma-slop-check` e o `figma-handoff-gate` rodaram de novo, e nenhum dos dois passa ainda:
+
+- **figma-slop-check:** de 16 achados para 6, 1 deles crítico (não existe estado de foco em lugar nenhum). Dos 6 que sobraram, 2 vêm da primeira auditoria, 2 já estavam na tela, mas a primeira auditoria não tinha apontado, e 2 nasceram da própria correção.
+- **figma-handoff-gate:** de 11 problemas para 13 (8 bloqueios), quase todos ligados a fluxos e estados que a correção não desenhou.
+
+São capturas reais do MCP oficial da Figma, de 05/10/2026, num arquivo de demonstração feito para o teste. O agente que plantou os defeitos tinha lido estas skills, e o prompt do auditor apontava as propriedades em que estava a maioria dos defeitos. Então o teste mostra que as checagens pegam problema num arquivo real, mas não que peguem tudo. As chamadas de ferramenta e o que o servidor oficial não conseguiu fazer estão no [works-with.md](works-with.md#blind-demo-on-the-official-figma-mcp), em inglês.
+
+</details>
+
+## Cole na sua IA
+
+Não precisa instalar nada. Copie o texto abaixo, cole na IA que você usa (Claude, ChatGPT, Gemini, Cursor) e preencha os colchetes.
+
+```text
+Use este arquivo como referência:
+https://raw.githubusercontent.com/thiagoxikota/figma-maxxing/main/llms.txt
+Se não conseguir abrir, me avise e
+não invente.
+Sou designer. [Tenho / Não tenho] um
+agente de IA conectado ao Figma.
+Meu contexto: [plano do Figma, se
+meus arquivos têm design system, se
+trabalho sozinho ou em time].
+Escolha no máximo cinco regras para o
+meu trabalho. Para cada uma, me dê
+uma checagem que eu consiga fazer no
+Figma hoje. Depois, diga se alguma
+skill vale a pena instalar no meu
+caso.
+```
+
+## O que dá errado e o que pega
+
+- O agente desenha um ícone que a biblioteca já tem → o `figma-preflight` procura antes.
+- O agente diz "pronto" e nada mudou → regras de releitura do `figma-preflight`.
+- Hex solto, camada com nome padrão, instância desanexada → `figma-slop-check`.
+- O handoff mostra "adicionar" e nunca "remover" → `figma-handoff-gate`.
+- Você resolve comentário por comentário, na mão → `figma-comment-fix-loop`.
+- A bridge caiu de novo → `figma-bridge-doctor`.
+
+## As skills
+
+- **[`figma-canon`](../skills/figma-canon/SKILL.md)** · As regras e os gotchas. Carrega por partes, só o que a tarefa pede.
+- **[`figma-preflight`](../skills/figma-preflight/SKILL.md)** · Antes de toda edição. Libera a edição ou devolve a lista do que falta, sem mexer no canvas.
+- **[`figma-orient`](../skills/figma-orient/SKILL.md)** · Primeiro contato com um arquivo. Mapeia páginas, componentes e variáveis e salva o mapa.
+- **[`figma-slop-check`](../skills/figma-slop-check/SKILL.md)** · Depois de editar. Acha cara de geração automática e valores fora das suas escalas e tokens.
+- **[`figma-handoff-gate`](../skills/figma-handoff-gate/SKILL.md)** · Antes do handoff. Toda ação precisa de um destino e de um caminho de volta.
+- **[`figma-comment-fix-loop`](../skills/figma-comment-fix-loop/SKILL.md)** · Quando chega feedback. Transforma os comentários abertos em correções, com evidência de cada uma.
+- **[`figma-click-flow`](../skills/figma-click-flow/SKILL.md)** · "Vira isso em fluxo." Desenha setas dos elementos clicáveis até as telas de destino.
+- **[`figma-bridge-doctor`](../skills/figma-bridge-doctor/SKILL.md)** · A bridge do figma-console caiu. Diagnostica e recupera a conexão (scripts para macOS).
+
+As skills estão escritas em inglês, para servir também a quem não fala português. Você conversa com o agente em português normalmente.
+
+<details>
+<summary>Como elas se encaixam</summary>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/flow-dark.png">
+  <img alt="Como as skills se encaixam: 01 mapear o arquivo com figma-orient, 02 conferir antes de editar com figma-preflight, 03 editar com use_figma ou figma_execute, 04 conferir depois com figma-slop-check, 05 entregar com figma-handoff-gate. O figma-canon guarda as regras que todo passo lê; o figma-comment-fix-loop roda os passos 02 a 04 uma vez por comentário." src="../assets/flow-light.png">
+</picture>
+
+</details>
+
+## Alguns gotchas
+
+- [Editar uma camada dentro de um grupo ou frame bloqueado falha sem aviso.](../skills/figma-canon/references/field-notes.md#writes-to-descendants-of-a-locked-node-fail-silently) A camada diz `locked: false`, o editor recusa mesmo assim e nada dá erro.
+- [O `instance.resize()` deixa o ícone no tamanho original dentro de uma caixa pequena.](../skills/figma-canon/references/plugin-api-anomalies.md#instanceresize-does-not-scale-the-children-use-rescale) Use `rescale()`.
+- [Sections novas saem pretas, mesmo com o preenchimento vinculado a uma variável de cor.](../skills/figma-canon/references/field-notes.md#a-section-fill-bound-to-a-variable-renders-the-base-color-you-passed) A section mostra a cor base que você passou ao vincular, não a variável. Resolva a variável antes de vincular.
+- [O `setTimeout` nunca dispara no sandbox do plugin.](../skills/figma-canon/references/field-notes.md#settimeout-never-fires-in-the-plugin-sandbox) Um limite de tempo feito com ele não limita nada.
+- [Mudar o `action` de uma reação de protótipo não faz nada.](../skills/figma-canon/references/field-notes.md#re-pointing-a-reaction-write-actions-not-action) O Figma lê `actions`, e mesmo assim a chamada volta com sucesso.
+
+**[Todos os gotchas, organizados por sintoma](gotchas.md)**, do jeito que um designer descreveria, e uma lista [por mensagem de erro](gotchas.md#by-error-message). A página está em inglês.
+
+## Por que isso, se a Figma tem skills oficiais
+
+As skills da própria Figma ajudam o agente a criar no Figma. As deste repositório conferem o trabalho do agente antes e depois de cada edição, e de novo no handoff. Use os dois conjuntos. O [landscape.md](landscape.md#how-figma-maxxing-composes-with-figmas-skills), em inglês, mapeia os servidores e os conjuntos de skills em volta do Figma, com datas.
+
+- **Bridge do figma-console:** as 8 skills, no meu trabalho em produção.
+- **MCP oficial da Figma:** o `figma-preflight`, o `figma-slop-check` e o `figma-handoff-gate` rodaram lá uma vez, no teste às cegas acima. O `figma-orient`, o `figma-comment-fix-loop` e o `figma-click-flow` descrevem esse caminho, mas ainda não rodaram nele. O `figma-bridge-doctor` não se aplica.
+
+Skill por skill: [works-with.md](works-with.md).
+
+## Instalar no seu agente
+
+O `npx skills add thiagoxikota/figma-maxxing` funciona com a maioria dos agentes. A CLI `skills` é de terceiros e envia contagem anônima de instalação; `DISABLE_TELEMETRY=1` desliga.
+
+Todas as rotas abaixo, menos a da pasta de plugin do Cursor, rodaram em 05/10/2026 a partir de uma cópia local desta versão, numa pasta de teste limpa, e cada uma instalou as 8 skills. Rodei tudo antes de publicar esta versão, então instalei a partir de uma pasta local, não pelos endereços do GitHub que aparecem aqui.
+
+<details>
+<summary><b>Claude Code</b></summary>
 
 ```text
 /plugin marketplace add thiagoxikota/figma-maxxing
 /plugin install figma-maxxing@figma-maxxing-skills
 ```
 
-As skills ficam disponíveis como `/figma-maxxing:figma-preflight` e assim por diante. O plugin só tem skills. Não instala hook nem servidor MCP.
+As skills aparecem como `/figma-maxxing:figma-preflight` e assim por diante. O plugin só tem skills: nenhum hook, nenhum servidor MCP. As descrições das skills custam cerca de 1.200 tokens em toda sessão (`claude plugin details`, Claude Code 2.1.289).
 
-**Cópia manual**
+</details>
+
+<details>
+<summary><b>Codex</b></summary>
+
+```bash
+codex plugin marketplace add thiagoxikota/figma-maxxing
+codex plugin add figma-maxxing@figma-maxxing-skills
+```
+
+Rodou com o codex-cli 0.156.1.
+
+</details>
+
+<details>
+<summary><b>GitHub Copilot CLI</b></summary>
+
+```bash
+copilot plugin marketplace add thiagoxikota/figma-maxxing
+copilot plugin install figma-maxxing@figma-maxxing-skills
+```
+
+Rodou com o Copilot CLI 1.0.61.
+
+</details>
+
+<details>
+<summary><b>Gemini CLI</b></summary>
+
+```bash
+gemini extensions install https://github.com/thiagoxikota/figma-maxxing
+```
+
+Rodou a partir de uma pasta local com o Gemini CLI 0.43.0, que pede para você confiar na pasta antes.
+
+</details>
+
+<details>
+<summary><b>Cursor</b> (não testado)</summary>
+
+Não tenho o Cursor instalado, então essa rota não rodou. Segundo a documentação, o Cursor lê o `.cursor-plugin/plugin.json`. Para testar, copie o repositório para `~/.cursor/plugins/local/figma-maxxing` e recarregue a janela. Ou use a CLI `skills`:
+
+```bash
+npx skills add thiagoxikota/figma-maxxing -a cursor
+```
+
+</details>
+
+<details>
+<summary><b>OpenCode, Windsurf e outros agentes</b></summary>
+
+```bash
+npx skills add thiagoxikota/figma-maxxing -a opencode
+npx skills add thiagoxikota/figma-maxxing -a windsurf
+```
+
+O `-a` também aceita `codex`, `cursor`, `gemini-cli`, `github-copilot` e `claude-code`. Acrescente `-g` para instalar na sua pasta de usuário. No teste, a CLI gravou as 8 skills em `.agents/skills` (`.windsurf/skills` no Windsurf, `.claude/skills` no `claude-code`). Os agentes em si não chegaram a ser executados.
+
+</details>
+
+<details>
+<summary><b>Cópia manual</b></summary>
 
 ```bash
 git clone https://github.com/thiagoxikota/figma-maxxing.git
 cd figma-maxxing
-python3 install.py --dry-run                      # mostra o que seria copiado
-python3 install.py --scope user                   # Claude Code, todos os projetos: ~/.claude/skills
-python3 install.py --target agents --scope user   # Codex e outros: ~/.agents/skills
+python3 install.py --scope user --dry-run
 ```
 
-O instalador copia pastas e mais nada. Ele se recusa a sobrescrever uma skill que já existe.
+O `--dry-run` mostra o que seria copiado. Depois rode uma destas duas linhas, não as duas:
+
+- `python3 install.py --scope user` instala para o Claude Code em `~/.claude/skills`.
+- `python3 install.py --target agents --scope user` instala em `~/.agents/skills`, para Codex, Cursor, Gemini CLI e outros.
+
+O instalador copia pastas e se recusa a sobrescrever uma skill que já existe.
 
 </details>
 
-## Comece pela tarefa
-
-Com a configuração de [O que você precisa](#o-que-você-precisa) pronta, diga ao agente, do seu jeito, o que precisa fazer. Sem essa configuração, use o texto de [Cole na sua IA](#cole-na-sua-ia).
-
-- **Aplicar o feedback que deixaram no arquivo.** Diga: "Corrige o que comentaram nessa página". O `figma-comment-fix-loop` lê os comentários abertos, corrige cada um no frame onde o pino está e te entrega a evidência.
-- **Conferir uma tela antes de dizer que está pronta.** Diga: "Essa tela tá pronta?" O `figma-slop-check` procura sinais de geração automática e falhas de precisão; depois `figma-handoff-gate` confere o que o dev precisa.
-- **Criar ou editar sem quebrar o arquivo.** Diga: "Adiciona um estado vazio nessa tela". O `figma-preflight` confirma o alvo, os tokens e os componentes que já existem antes de escrever um nó.
-- **Entender um arquivo que você acabou de abrir.** Cole a URL do Figma. O `figma-orient` mapeia páginas, componentes e variáveis e guarda o mapa para a próxima vez.
-
-## O que dá errado e o que evita
-
-**1. Parece certo até você clicar na camada.**
-Sem orientação, o agente usa valor solto e desenha do zero o que já existe na biblioteca. Em poucas sessões, uma feature pode acumular dezenas de ícones desenhados à mão. Cada edição parecia inofensiva. O `figma-preflight` faz o agente procurar o componente e o ícone de verdade antes de editar qualquer coisa.
-
-**2. O agente disse que funcionou. Nada mudou.**
-Uma camada dentro de um grupo bloqueado ignora a alteração sem dar erro. Num lote grande de vínculos de variável, alguns não foram aplicados, e mesmo assim a conferência de cor passou, porque nada tinha mudado. A regra que saiu disso: depois de editar, leia de volta a propriedade que você mudou, nunca um sinal indireto dela.
-
-**3. A Plugin API não se comporta como você imagina.**
-O `figma-canon` carrega a lista do que me surpreendeu, cada item com sintoma, causa e correção. Tem [alguns deles](#alguns-dos-gotchas) mais abaixo.
-
-**4. Você vira o intermediário entre cada comentário e cada correção.**
-O `figma-comment-fix-loop` puxa os comentários abertos, trata cada um no frame onde o pino está e devolve uma lista que liga cada comentário à mudança e a uma captura, ou ao motivo de ter ficado aberto.
-
-**5. O handoff desenha o "adicionar" e esquece o "remover".**
-O dev constrói o que está desenhado e adivinha o resto. O `figma-handoff-gate` lista cada elemento interativo e pergunta para onde ele leva. Se uma direção existe, o caminho de volta também tem que existir.
-
-**6. A bridge caiu de novo.**
-O `figma-bridge-doctor` cuida da conexão entre o agente e o Figma Desktop. Ele tenta primeiro o menor conserto e pergunta antes de fechar o Figma.
-
-## As skills
-
-- **[`figma-canon`](../skills/figma-canon/SKILL.md)** · Sempre que o assunto é Figma. A base de conhecimento: regras da Plugin API, gotchas, auto layout, nomes, cobertura de estados, formato de handoff. Carrega só o pedaço que a tarefa pede.
-- **[`figma-preflight`](../skills/figma-preflight/SKILL.md)** · Antes de toda edição. Conferência que não edita nada. Libera a edição ou devolve a lista do que falta. Também audita fluxo: tela órfã e botão que não leva a lugar nenhum.
-- **[`figma-orient`](../skills/figma-orient/SKILL.md)** · Primeiro contato com um arquivo. Monta o mapa do arquivo e salva no seu projeto.
-- **[`figma-slop-check`](../skills/figma-slop-check/SKILL.md)** · Depois de editar. Pega design com cara de máquina e design impreciso.
-- **[`figma-handoff-gate`](../skills/figma-handoff-gate/SKILL.md)** · Antes do handoff. Ação completa, qualidade da anotação, prova na escala certa, arquivo sem rastro do processo.
-- **[`figma-comment-fix-loop`](../skills/figma-comment-fix-loop/SKILL.md)** · Quando chega feedback. Do comentário à correção, com evidência.
-- **[`figma-click-flow`](../skills/figma-click-flow/SKILL.md)** · "Vira isso em fluxo". Desenha as setas do elemento clicável até a tela de destino.
-- **[`figma-bridge-doctor`](../skills/figma-bridge-doctor/SKILL.md)** · Problema de conexão. Diagnostica e recupera a conexão da Desktop Bridge (macOS).
-
-## Alguns dos gotchas
-
-De [`plugin-api-anomalies.md`](../skills/figma-canon/references/plugin-api-anomalies.md) e [`field-notes.md`](../skills/figma-canon/references/field-notes.md):
-
-- [Uma section vinculada a uma variável de cor mostra a cor que você passou, não a da variável.](../skills/figma-canon/references/field-notes.md#a-section-fill-bound-to-a-variable-renders-the-base-color-you-passed) Resolva a variável antes de vincular.
-- [Alteração dentro de um grupo bloqueado falha sem aviso.](../skills/figma-canon/references/field-notes.md#writes-to-descendants-of-a-locked-node-fail-silently) O nó diz `locked: false`, o editor recusa mesmo assim e nada dá erro.
-- [O `instance.resize()` deixa o ícone no tamanho cheio dentro de uma caixa pequena.](../skills/figma-canon/references/plugin-api-anomalies.md#instanceresize-does-not-scale-the-children-use-rescale) Use `rescale()`.
-- [Trocar um nó dentro do componente principal apaga o override de todas as instâncias.](../skills/figma-canon/references/plugin-api-anomalies.md#replacing-a-node-inside-a-master-wipes-the-override-on-every-instance) Guarde os overrides antes da troca e aplique de volta depois.
-- [O `clone()` de um filho de section vai parar na página, não na section.](../skills/figma-canon/references/plugin-api-anomalies.md#clone-of-a-section-child-lands-at-page-level-not-in-the-section) A captura parece certa. A árvore de camadas mostra que não.
-- [A exportação por REST pode ficar minutos atrás das suas edições.](../skills/figma-canon/references/plugin-api-anomalies.md#rest-v1images-renders-stale-cloud-state-after-plugin-edits) Confira o próprio PNG exportado, não o canvas.
-- [O `setTimeout` nunca dispara no sandbox do plugin.](../skills/figma-canon/references/field-notes.md#settimeout-never-fires-in-the-plugin-sandbox) Um limite de tempo feito com ele não limita nada.
-- [Mudar o `action` de uma reação de protótipo não faz nada.](../skills/figma-canon/references/field-notes.md#re-pointing-a-reaction-write-actions-not-action) O Figma lê `actions`, e a chamada ainda volta com sucesso.
-- [O `getNodeByIdAsync` pode travar em vez de dar erro](../skills/figma-canon/references/plugin-api-anomalies.md#getnodebyidasync-hangs-does-not-throw-in-large-multi-page-files) num arquivo grande, com muitas páginas.
-
-Os dois arquivos reúnem mais de 80 notas como essas, sobre a Plugin API, a bridge e o uso de vários agentes no mesmo arquivo. A Figma e outras pessoas mantêm listas próprias. Estas são as que eu aprendi em produção, quase todas pela bridge do figma-console.
-
 ## O que você precisa
 
-- **Figma Desktop** para macOS ou Windows. A versão do navegador não basta: a bridge é um plugin de desenvolvimento, e a Figma só importa esse tipo de plugin no app.
-- **[figma-console-mcp](https://github.com/southleft/figma-console-mcp)**, da Southleft (MIT). Roda na sua máquina e conversa com o Figma pelo plugin Desktop Bridge. Estas skills foram escritas para a ferramenta `figma_execute` dele. Última conferência: v1.40.8.
-- **Node.js 18 ou mais novo.**
-- **Um cliente MCP que carregue Agent Skills.** Eu uso o Claude Code.
-- **Um token pessoal da Figma** para o fluxo de comentários, com File content (leitura), File versions (leitura), Variables (leitura) e Comments (leitura e escrita). Ele serve para chamadas REST, como ler comentário. O trabalho no canvas passa pela bridge.
+As skills precisam de um agente que carregue Agent Skills e de uma conexão com o Figma. Dá para conectar de dois jeitos.
 
-No Claude Code, a configuração é esta. Em outros clientes, siga o [guia do projeto original](https://github.com/southleft/figma-console-mcp#readme).
+**Servidor MCP oficial da Figma.** O mais simples de configurar. No Claude Code:
 
 ```bash
-claude mcp add figma-console -s user -e FIGMA_ACCESS_TOKEN=figd_YOUR_TOKEN_HERE -e ENABLE_MCP_APPS=true -- npx -y figma-console-mcp@latest
+claude mcp add --transport http figma https://mcp.figma.com/mcp
 ```
 
-1. Reinicie o Claude Code para ele subir o servidor. Na primeira vez, o servidor cria o manifesto do plugin.
+Para outros agentes, veja o [guia da Figma](https://github.com/figma/mcp-server-guide). Editar pelo `use_figma` exige um assento Full, menos nos seus próprios rascunhos, onde o [FAQ do servidor MCP da Figma](https://help.figma.com/hc/en-us/articles/39252411778583-Figma-MCP-server-FAQs) também deixa um assento Dev editar. No plano Starter o limite de chamadas é baixo ([nota de campo](../skills/figma-canon/references/field-notes.md#the-official-figma-mcp-server-has-a-hard-tool-call-cap-on-a-starter-plan)). Usar o servidor significa aceitar os [Termos de Desenvolvedor da Figma](https://www.figma.com/legal/developer-terms/).
+
+**[figma-console-mcp](https://github.com/southleft/figma-console-mcp)**, da Southleft (MIT). É a rota que eu uso no meu trabalho e a que serviu de base para estas skills. Roda na sua máquina e se conecta ao Figma Desktop (macOS ou Windows) pelo plugin Desktop Bridge. Você precisa do Node.js 18 ou mais novo e de um token pessoal da Figma. Conferido pela última vez na v1.40.8. No Claude Code:
+
+```bash
+claude mcp add figma-console -s user \
+  -e FIGMA_ACCESS_TOKEN=figd_YOUR_TOKEN_HERE \
+  -e ENABLE_MCP_APPS=true \
+  -- npx -y figma-console-mcp@latest
+```
+
+1. Reinicie o Claude Code. Na primeira vez, o servidor cria o manifesto do plugin.
 2. No Figma Desktop, abra um arquivo e vá em Plugins, Development, Import plugin from manifest. Escolha `~/.figma-console-mcp/plugin/manifest.json` (`~` é a sua pasta de usuário).
 3. Rode o plugin Figma Desktop Bridge no arquivo em que você vai trabalhar.
 4. Peça ao agente: "confere a conexão com o Figma". Ele deve chamar `figma_get_status`.
 
-Esse comando grava o token em texto puro na configuração do agente, e ele pode ficar no histórico do terminal. Trate os dois como segredo e nunca suba a configuração para o Git. Quando o figma-console-mcp atualiza, as notas da versão às vezes pedem para importar o manifesto de novo.
+Esse comando grava o token em texto puro na configuração do agente, e o próprio comando, com o token, pode ficar no histórico do terminal. Trate a configuração e o histórico como segredo e nunca suba nenhum dos dois para o Git. Em outros agentes, siga o [guia do projeto original](https://github.com/southleft/figma-console-mcp#readme).
 
-**Usa só o MCP oficial da Figma?** Eu não validei estas skills lá: escrevi e usei tudo pela bridge do figma-console. A ferramenta `use_figma` dele também executa código da Plugin API, então o `figma-canon`, o `figma-slop-check` e o `figma-handoff-gate` continuam valendo como regras e checklists, e o `figma-preflight` aceita esse servidor como caminho de edição.
+**Para o fluxo de comentários, em qualquer servidor:** um token pessoal com File content (leitura), File versions (leitura), Variables (leitura) e Comments (leitura e escrita). O `figma-comment-fix-loop` lê os comentários pela API REST.
 
-**Quanto custa.** Este repositório e o figma-console-mcp são gratuitos e de código aberto. O agente e o seu plano da Figma não estão incluídos.
+As skills são Markdown puro e rodam onde o seu agente rodar. Os scripts de recuperação da bridge são só para macOS. Este repositório e o figma-console-mcp são gratuitos; o agente e o seu plano da Figma, não.
 
-## O hook opcional
+### O hook opcional
 
-O `hooks/figma-canon-precheck.py` lê o script que o agente vai rodar no Figma e avisa sobre padrões que costumam falhar, antes de a chamada chegar ao Figma. Nada neste repositório instala esse hook. Para ligar no Claude Code, coloque isto no seu `settings.json`:
+O `hooks/figma-canon-precheck.py` lê o script que o agente vai rodar no Figma e avisa sobre 13 padrões problemáticos conhecidos antes de a chamada chegar ao Figma. Ele nunca é instalado automaticamente. Para ligar no Claude Code, coloque isto no seu `settings.json`:
 
 ```json
 {
@@ -169,7 +275,11 @@ O `hooks/figma-canon-precheck.py` lê o script que o agente vai rodar no Figma e
       {
         "matcher": "mcp__figma-console__figma_execute(_across_files)?",
         "hooks": [
-          { "type": "command", "command": "python3 /caminho/para/figma-maxxing/hooks/figma-canon-precheck.py", "timeout": 10 }
+          {
+            "type": "command",
+            "command": "python3 /caminho/para/figma-maxxing/hooks/figma-canon-precheck.py",
+            "timeout": 10
+          }
         ]
       }
     ]
@@ -177,24 +287,61 @@ O `hooks/figma-canon-precheck.py` lê o script que o agente vai rodar no Figma e
 }
 ```
 
-Por padrão ele só acrescenta avisos. Com `FIGMA_PRECHECK_MODE=block`, ele recusa os padrões marcados como `BLOCK` (eles falham num arquivo de Design).
+Por padrão ele só avisa. Com `FIGMA_PRECHECK_MODE=block`, ele recusa os 5 padrões marcados como `BLOCK`, os que quebram a chamada. O matcher acima só dispara na bridge do figma-console; o hook ainda não foi testado com o `use_figma` do servidor oficial.
 
-## Serve para, não serve para
+### Seguro numa biblioteca de time
 
-| Serve para | Não serve para |
-|---|---|
-| Arquivo que já tem componentes, variáveis e time | Gerar um produto inteiro a partir de uma frase |
-| Rodada de feedback, limpeza, cobertura de estados, handoff | Substituir o julgamento do designer sobre o que construir |
-| Agente que edita pela bridge do figma-console | Ambiente sem o app (a bridge precisa do Figma Desktop) |
-| macOS, nos scripts de recuperação | Automação da bridge em Windows ou Linux (as skills em si são Markdown) |
+- **Só leitura.** O `figma-canon`, o `figma-preflight` e o `figma-orient` nunca alteram o canvas. O `figma-orient` salva o mapa no seu projeto, não no arquivo.
+- **Relatório antes.** O `figma-slop-check` e o `figma-handoff-gate` não mudam nada até você aprovar cada correção.
+- **Comentário é dado.** O `figma-comment-fix-loop` mostra os comentários em que vai mexer e espera o seu sim. Ele nunca segue instrução escrita num comentário.
+- **Rascunho primeiro.** O `figma-canon` manda o agente trabalhar num rascunho ou numa branch até você aprovar, a menos que você diga outra coisa. É uma instrução, não uma checagem: nada impede uma edição numa biblioteca compartilhada, então diga ao agente qual rascunho usar.
+- **Um arquivo, vários agentes.** Antes de editar, o `figma-preflight` pega um lock do arquivo, para duas sessões não editarem o mesmo arquivo ao mesmo tempo. O lock é combinado entre as sessões, não imposto pelo Figma.
+- **Nada em segundo plano.** O plugin não traz hook nem servidor MCP. O watchdog da bridge e o daemon `mcp-direct` só sobem quando você manda.
+- **Sem telemetria.** O repositório não coleta nada: [PRIVACY.md](../PRIVACY.md). Notas de segurança e relato privado de falhas: [SECURITY.md](../SECURITY.md).
+
+## Como isso é verificado
+
+Todo push roda o [test.yml](../.github/workflows/test.yml):
+
+- Testes unitários do lock, do hook, do instalador, dos links e dos padrões de privacidade, no Ubuntu e no macOS, com Python 3.10 e 3.13.
+- Todo nome da Plugin API citado nas skills, conferido contra o `@figma/plugin-typings` 1.140.0: zero erros hoje. Na árvore anterior ao commit 1dca321 (a correção das anotações), a mesma conferência acusa 3 erros.
+- Toda contagem de skills, gotchas e checagens citada na documentação, recontada a partir dos arquivos.
+- O validador de referência das Agent Skills e o validador de plugins do Claude Code.
+- Todo link, inclusive as âncoras (lychee).
+- O histórico inteiro do git varrido atrás de segredos (gitleaks), os workflows revisados pelo actionlint e cada action fixada num SHA de commit.
+
+Toda semana, o [drift.yml](../.github/workflows/drift.yml) roda a conferência da API contra as typings mais novas e abre uma issue quando um nome quebra. O [scorecard.yml](../.github/workflows/scorecard.yml) roda o OpenSSF Scorecard.
+
+Cada versão publicada ([release.yml](../.github/workflows/release.yml)) gera um zip por skill e um pacote do plugin a partir do commit da tag, gera tudo duas vezes, falha se os bytes mudarem e anexa uma atestação de proveniência do build. Para conferir um download:
+
+```bash
+gh attestation verify figma-preflight-1.1.0.zip \
+  --repo thiagoxikota/figma-maxxing
+```
+
+Fora deste repositório, o [M8ven Trust Index](https://m8ven.ai/mcp/thiagoxikota/figma-maxxing) avalia o projeto de forma independente. Lá, um projeto novo fica limitado à nota C até ganhar adoção; o código em si tirou 100 de 100 em 05/10/2026.
+
+[![M8ven Trust Index](https://m8ven.ai/badge/mcp/thiagoxikota/figma-maxxing)](https://m8ven.ai/mcp/thiagoxikota/figma-maxxing)
 
 ## Até onde foi testado
 
-Eu construí estas skills no Claude Code, no macOS, com o figma-console-mcp, no meu próprio trabalho. Esta edição pública é uma reescrita daquele conjunto: traduzida para o inglês, generalizada e sem nenhum nome ou detalhe que identifique cliente. O lock, o hook e o instalador têm testes automáticos que rodam a cada push. Ainda não rodei a edição pública de ponta a ponta numa segunda máquina. Se alguma coisa ainda depender do meu ambiente, [abra uma issue](https://github.com/thiagoxikota/figma-maxxing/issues) com o seu ambiente e o erro exato.
+Em 05/10/2026:
+
+- **Meu trabalho.** Construí estas skills no Claude Code, no macOS, com o figma-console-mcp, em arquivos reais. Esta edição pública é uma reescrita daquele conjunto: em inglês, generalizada e sem nenhum detalhe de cliente. Ainda não rodou de ponta a ponta numa segunda máquina.
+- **MCP oficial da Figma.** O teste às cegas lá de cima, numa tela de demonstração. A auditoria usou 12 chamadas ao MCP da Figma, a correção usou 13 e a segunda auditoria, mais 13. Alguns passos não tinham ferramenta lá ou esbarraram em limite: não há seleção, o `get_screenshot` não captura acima de 1x, não há status da bridge e cada chamada tem limite de 20 KB. Os agentes contornaram esses limites usando o `use_figma` só para ler, sem editar nada, e registraram cada contorno no [works-with.md](works-with.md#blind-demo-on-the-official-figma-mcp).
+- **Instalações.** Todas as rotas de [Instalar no seu agente](#instalar-no-seu-agente), menos o Cursor, a partir de uma cópia local.
+
+Se alguma coisa ainda depender do meu ambiente, [abra uma issue](https://github.com/thiagoxikota/figma-maxxing/issues) com o seu ambiente e o erro exato.
 
 ## Contribuir
 
-A melhor contribuição é um problema que você encontrou de verdade, com sintoma, causa e correção. Veja o [CONTRIBUTING.md](../CONTRIBUTING.md), o [código de conduta](../CODE_OF_CONDUCT.md) e o [changelog](../CHANGELOG.md). As notas de segurança estão no [SECURITY.md](../SECURITY.md).
+A melhor contribuição é um gotcha que você encontrou de verdade, com sintoma, causa e correção. Dúvidas e prints de antes e depois vão para as [Discussions](https://github.com/thiagoxikota/figma-maxxing/discussions); bugs e gotchas, para as [issues](https://github.com/thiagoxikota/figma-maxxing/issues/new/choose). Veja o [CONTRIBUTING.md](../CONTRIBUTING.md), o [código de conduta](../CODE_OF_CONDUCT.md) e o [changelog](../CHANGELOG.md). Vai contribuir com um agente? Peça para ele ler o [AGENTS.md](../AGENTS.md).
+
+Se alguma regra pegou um problema no seu arquivo, deixe uma estrela. É assim que outros designers encontram o projeto.
+
+## Quem fez
+
+Sou o Thiago Xikota, AI Product Designer, fundador da Xikota Design e pesquisador no Lemme (UFSC). Estou escrevendo o *Design na era da IA* (Casa do Código, em produção). [Me siga no LinkedIn](https://www.linkedin.com/in/thiagoxikota).
 
 ## Créditos
 
