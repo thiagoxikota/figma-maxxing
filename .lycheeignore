@@ -1,0 +1,12 @@
+# URLs the link checker (lychee) skips, one regular expression per line.
+# Add a URL here only when it cannot be checked without a login or from a CI runner, and say why.
+# A link that is simply broken gets fixed, not ignored.
+
+# Local servers in examples (the figma-console bridge, MCP servers on this machine).
+^https?://(localhost|127\.0\.0\.1)([:/]|$)
+
+# Figma Community pages answer 403 to non-browser clients and 200 to a browser (checked 2026-10-05).
+^https://www\.figma\.com/community/
+
+# LinkedIn answers 999 to non-browser clients, so a CI runner cannot check it (checked 2026-10-05).
+^https://(www\.)?linkedin\.com/

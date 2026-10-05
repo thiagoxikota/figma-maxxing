@@ -2,19 +2,124 @@ name: Test
 on:
   push:
   pull_request:
+  workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  checks:
+  unit:
+    name: unit (${{ matrix.os }}, Python ${{ matrix.python }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
         python: ['3.10', '3.13']
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python }}
-      - run: python -m pip install pyyaml
+      - run: python -m pip install --require-hashes -r .github/requirements-ci.txt
       - run: python -m unittest discover -s tests -v
+
+  api:
+    name: Plugin API names vs @figma/plugin-typings
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+      - name: check_api.py (pinned typings, sha512 verified)
+        run: python scripts/check_api.py --strict
+      - name: count_claims.py (numbers in the docs match the files)
+        run: python scripts/count_claims.py --check
+
+  spec:
+    name: Agent Skills spec and plugin manifests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+      - run: python -m pip install --require-hashes -r .github/requirements-ci.txt
+      - name: agentskills validate (skills-ref, the agentskills.io reference validator)
+        run: for skill in skills/*/; do agentskills validate "$skill"; done
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+      - name: claude plugin validate --strict (Claude Code 2.1.289, no login needed)
+        env:
+          DISABLE_AUTOUPDATER: '1'
+          DISABLE_TELEMETRY: '1'
+          CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: '1'
+        run: |
+          cc() { npx --yes @anthropic-ai/claude-code@2.1.289 "$@"; }
+          cc plugin validate .
+          cc plugin validate --strict .
+
+  links:
+    name: Links in Markdown and llms.txt
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          fail: true
+          args: >-
+            --no-progress --include-fragments --accept '200..=299,429'
+            --remap 'https://raw\.githubusercontent\.com/thiagoxikota/figma-maxxing/main/(.*) file://${{ github.workspace }}/$1'
+            --remap 'https://github\.com/thiagoxikota/figma-maxxing/(?:blob|tree)/main/([^#]*) file://${{ github.workspace }}/$1'
+            './**/*.md' llms.txt
+
+  secrets:
+    name: gitleaks over the full history
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install gitleaks 8.30.1 (sha256 checked)
+        run: |
+          curl -sSfL -o "$RUNNER_TEMP/gitleaks.tgz" \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz
+          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  $RUNNER_TEMP/gitleaks.tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/gitleaks.tgz" -C "$RUNNER_TEMP" gitleaks
+      - name: gitleaks git (reviewed false positives in .gitleaksignore)
+        run: '"$RUNNER_TEMP/gitleaks" git --redact --no-banner --verbose .'
+
+  workflows:
+    name: actionlint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install actionlint 1.7.12 (sha256 checked)
+        run: |
+          curl -sSfL -o "$RUNNER_TEMP/actionlint.tgz" \
+            https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz
+          echo "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8  $RUNNER_TEMP/actionlint.tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/actionlint.tgz" -C "$RUNNER_TEMP" actionlint
+      - run: '"$RUNNER_TEMP/actionlint" -color'

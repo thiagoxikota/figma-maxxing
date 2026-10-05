@@ -4,9 +4,15 @@ __pycache__/
 .venv/
 .env
 .env.*
-.claude/
+.claude/*
+!.claude/CLAUDE.md
 .codex/
 .agents/
 node_modules/
 *.zip
 *.log
+
+# Release build output (scripts/build_dist.py) and link checker output
+dist/
+lychee/
+.lycheecache

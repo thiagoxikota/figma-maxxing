@@ -1,0 +1,6 @@
+# Reviewed gitleaks false positives. One fingerprint per line; lines starting with # are comments.
+# plugin-api-core.md line 110 assigns a made-up example string to componentKey in a code sample.
+# It is placeholder text, not a key. First entry: history scan (gitleaks git).
+# Second entry: working-tree scan (gitleaks dir).
+687f902cbc5ad3fa6e42facf55b0991cb6d6815f:skills/figma-canon/references/plugin-api-core.md:generic-api-key:110
+skills/figma-canon/references/plugin-api-core.md:generic-api-key:110

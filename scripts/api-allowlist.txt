@@ -1,0 +1,62 @@
+# Exceptions for scripts/check_api.py. One entry per line:
+#
+#   <kind> <identifier> [in=<path glob>] <reason, at least three words>
+#
+# Kinds:
+#   absent    The skills cite this name because it does NOT exist. It must stay absent from
+#             @figma/plugin-typings, and every mention must sit on a line (or right below a
+#             line) that says so (not, never, no, instead, throws, TypeError, ...).
+#             Forms: figma.x (a chain), .member (any receiver), name() (a bare call in inline code).
+#   editor    Exists in the typings, but only in another editor (FigJam, Slides, Buzz). The skills
+#             mention it on purpose, usually to warn against it in Design files.
+#   receiver  An object outside the Plugin API. Its members are not checked.
+#   member    A field of a payload outside the Plugin API. Never checked.
+#   global    figma.<x> that is not the plugin global.
+#
+# Keep every reason true. check_api.py prints entries nothing uses so the list stays short.
+
+# Deliberate negatives: the skills warn that these do not exist.
+absent figma.createAutoLayout   field-notes.md: not a Plugin API method; agents invent it and get TypeError
+absent .query                   field-notes.md: node.query is not Plugin API; calling it throws TypeError
+absent .set                     field-notes.md: node.set is not Plugin API; calling it throws TypeError
+absent getAnnotations()         plugin-api-data.md: no such method; annotations live in node.annotations (fixed in 1dca321)
+absent setAnnotations()         plugin-api-data.md: no such method; write node.annotations instead (fixed in 1dca321)
+
+# Editor-specific members the skills mention on purpose.
+editor figma.createConnector    FigJam only; the skills warn that it is undefined in Design files and give the SVG workaround
+
+# Receivers outside the Plugin API.
+receiver console        JS console; its output never reaches the agent, which the skills point out
+receiver JSON           JS builtin object
+receiver Math           JS builtin object
+receiver Object         JS builtin object
+receiver Array          JS builtin object
+receiver Promise        JS builtin object
+receiver os             Node.js module used in helper scripts, not plugin code
+receiver document       browser global in plugin UI examples, not the sandbox
+receiver http           Node.js module used in helper scripts, not plugin code
+receiver crypto         Node.js module used in helper scripts, not plugin code
+receiver re             Python module in a diagnostic snippet
+receiver xml            Python module in a diagnostic snippet
+receiver socket         Python module in a diagnostic snippet
+receiver client_meta    REST comments payload (GET /v1/files/:key/comments), not Plugin API
+receiver user           REST comments payload (GET /v1/files/:key/comments), not Plugin API
+receiver transport      figma-console MCP figma_get_status payload, not Plugin API
+receiver setup          figma-console MCP figma_get_status payload, not Plugin API
+receiver fileContext    figma-console MCP figma_get_status payload, not Plugin API
+receiver networkAccess  plugin manifest.json field, not Plugin API
+receiver Card           Code Connect React example component (Card.Header), not Plugin API
+
+# Payload fields outside the Plugin API.
+member pluginVersion          figma-console MCP figma_get_status connectedFiles entry field
+
+# figma.<x> that is not the plugin global.
+global figma.com      the figma.com domain in URLs and prose
+global figma.config   the Code Connect figma.config.json file name
+global figma.connect      in=*code-connect* Code Connect figma import, not the plugin global
+global figma.string       in=*code-connect* Code Connect figma import, not the plugin global
+global figma.enum         in=*code-connect* Code Connect figma import, not the plugin global
+global figma.boolean      in=*code-connect* Code Connect figma import, not the plugin global
+global figma.instance     in=*code-connect* Code Connect figma import, not the plugin global
+global figma.children     in=*code-connect* Code Connect figma import, not the plugin global
+global figma.nestedProps  in=*code-connect* Code Connect figma import, not the plugin global
