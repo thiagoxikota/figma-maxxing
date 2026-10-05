@@ -1,0 +1,67 @@
+title: "Before and after: "
+labels: [show-and-tell]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Show a file before and after an agent worked on it with these skills: what got caught, what got fixed, what still slipped through. Misses are as welcome as wins; they become the next gotcha.
+
+        Share only a file you own or have permission to show. Crop or blur client names, people, logos and real content. Never paste a file URL, a file key or a token.
+  - type: dropdown
+    id: skills
+    attributes:
+      label: Skills used
+      multiple: true
+      options:
+        - figma-canon
+        - figma-preflight
+        - figma-orient
+        - figma-slop-check
+        - figma-handoff-gate
+        - figma-comment-fix-loop
+        - figma-click-flow
+        - figma-bridge-doctor
+        - Only llms.txt in a chat AI
+    validations:
+      required: true
+  - type: textarea
+    id: job
+    attributes:
+      label: The job
+      description: What you asked the agent to do, in one or two sentences.
+      placeholder: Fix the open comments on the checkout flow and check the handoff before sending it to the developers.
+    validations:
+      required: true
+  - type: textarea
+    id: before
+    attributes:
+      label: Before
+      description: A screenshot or a short description. Drag images here.
+    validations:
+      required: true
+  - type: textarea
+    id: after
+    attributes:
+      label: After
+      description: The same view after the run.
+    validations:
+      required: true
+  - type: textarea
+    id: caught
+    attributes:
+      label: What the skills caught or missed
+      description: The punch list, the gate output or your own notes. Paste text rather than a screenshot when you can.
+  - type: input
+    id: setup
+    attributes:
+      label: Setup
+      placeholder: Claude Code, figma-console-mcp 1.40.9, Figma Desktop, figma-maxxing 1.1.0
+  - type: checkboxes
+    id: permission
+    attributes:
+      label: Before you post
+      options:
+        - label: I own this file or have permission to share these images.
+          required: true
+        - label: No client or people names, no file URLs or keys, no tokens are visible.
+          required: true

@@ -2,3 +2,9 @@
 *.png binary
 *.sh text eol=lf
 *.py text eol=lf
+
+# Language bar: the skills are Markdown, so count Markdown (GitHub skips prose by default).
+*.md linguist-detectable
+
+# The HTML files are only the sources of the banner and diagram PNGs, not the product.
+assets/*.html linguist-documentation

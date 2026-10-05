@@ -1,11 +1,14 @@
 name: New gotcha
 description: A Figma Plugin API or bridge behavior that surprised you, with the fix you ran.
+title: "Gotcha: "
 labels: [gotcha]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks. Please leave out client names, file keys, node ids from real files, tokens and screenshots of work you do not own.
+        Thanks. A gotcha joins the canon when someone hit it in a real file and ran the fix. No fix yet? Open a blank issue with the symptom instead; it becomes a gotcha once someone runs a fix.
+
+        Please leave out client names, file keys, node ids from real files, tokens and screenshots of work you do not own. Use `<fileKey>` and `123:456`.
   - type: textarea
     id: symptom
     attributes:
@@ -23,13 +26,41 @@ body:
     attributes:
       label: Fix
       description: What you ran that worked. Code welcome.
+      render: javascript
+    validations:
+      required: true
+  - type: textarea
+    id: detector
+    attributes:
+      label: Detector
+      description: Optional. A snippet that finds the problem before it ships. A rule an agent can check beats a rule it has to remember.
+      render: javascript
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where it happens
+      options:
+        - Plugin API (figma_execute or use_figma)
+        - Bridge, MCP server or connection
+        - Several agents on one file
+        - REST API, export or comments
+        - Not sure
     validations:
       required: true
   - type: input
     id: versions
     attributes:
       label: Versions and month
-      description: Figma Desktop, figma-console-mcp, agent, and when you saw it.
-      placeholder: Figma Desktop 126, figma-console-mcp 1.40.8, Claude Code, 2026-10
+      description: Figma Desktop, figma-console-mcp or the official Figma MCP, your agent, and when you saw it.
+      placeholder: Figma Desktop 126, figma-console-mcp 1.40.9, Claude Code, 2026-10
     validations:
       required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Before you submit
+      options:
+        - label: I hit this myself and the fix above is what I ran.
+          required: true
+        - label: No client, product or people names, no real file keys or node ids, no tokens.
+          required: true

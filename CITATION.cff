@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: If you use these skills in research, teaching or a write-up, please cite them as below.
+title: "Figma Maxxing: agent skills for real Figma files"
+type: software
+authors:
+  - given-names: Thiago
+    family-names: Xikota
+repository-code: https://github.com/thiagoxikota/figma-maxxing
+url: https://github.com/thiagoxikota/figma-maxxing
+license: MIT
+version: 1.1.0
+date-released: 2026-10-05
+keywords:
+  - figma
+  - agent-skills
+  - claude-code
+  - figma-plugin-api
+  - design-systems
+  - design-handoff
+  - mcp
+abstract: >-
+  Eight Agent Skills for AI agents that work on real Figma files: Plugin API
+  gotchas learned in production, read-only checks before a write, checks after
+  it, a loop from open comments to verified fixes, and a handoff gate.

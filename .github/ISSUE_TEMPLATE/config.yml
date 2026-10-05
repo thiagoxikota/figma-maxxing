@@ -1,1 +1,8 @@
 blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/thiagoxikota/figma-maxxing/security/advisories/new
+    about: Report it privately. Please do not open a public issue.
+  - name: Questions and before/after shots
+    url: https://github.com/thiagoxikota/figma-maxxing/discussions
+    about: Ask a question or show what a check caught in your file.

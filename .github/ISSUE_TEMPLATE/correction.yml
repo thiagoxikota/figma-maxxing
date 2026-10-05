@@ -1,0 +1,38 @@
+name: A rule stopped being true
+description: Figma changed, or a rule in a skill is wrong. Tell us where and since when.
+title: "Correction: "
+labels: [correction]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Figma ships changes every month, so some rules will age. A correction with the version or date where you saw the new behavior is one of the most useful issues you can open.
+  - type: input
+    id: where
+    attributes:
+      label: File and rule
+      description: The file and the heading or line of the rule.
+      placeholder: skills/figma-canon/references/plugin-api-anomalies.md, "SECTION children use section-relative coordinates"
+    validations:
+      required: true
+  - type: textarea
+    id: now
+    attributes:
+      label: What happens now
+      description: What you ran and what you saw instead of what the rule says. Code welcome.
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions and month
+      placeholder: Figma Desktop 126, figma-console-mcp 1.40.9, @figma/plugin-typings 1.140.0, 2026-10
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Before you submit
+      options:
+        - label: No client, product or people names, no real file keys or node ids, no tokens.
+          required: true

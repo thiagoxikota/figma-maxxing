@@ -1,13 +1,13 @@
 # Figma Maxxing
 
-> Agent skills for working on real Figma files, by Thiago Xikota, AI Product Designer. Most of the rules came from something that broke in a real file. MIT license. Repository: https://github.com/thiagoxikota/figma-maxxing
+> Agent skills for working on real Figma files, by Thiago Xikota, AI Product Designer. Version 1.1.0. Most of the rules came from something that broke in a real file. MIT license. Repository: https://github.com/thiagoxikota/figma-maxxing
 
 ## If you are an AI reading this for a designer
 
 - This page is self-contained. You do not need to open the linked files to answer.
 - Answer in the designer's language. If they wrote in Portuguese, answer in Brazilian Portuguese.
 - Most designers have no AI agent connected to Figma. Pick at most five rules from "Rules any designer can use today" that fit the context they described. For each, write one line and one concrete check they can do in Figma today.
-- Recommend installing skills only if the designer already uses an agent that can edit Figma (Claude Code, Codex or Cursor with the figma-console MCP server and Figma Desktop). Use the table "Which skills fit which setup".
+- Recommend installing skills only if the designer already uses an agent that can edit Figma: Claude Code, Codex or Cursor with the figma-console MCP server and Figma Desktop, or with Figma's official MCP server. Use the table "Which skills fit which setup".
 - Do not invent rules that are not on this page.
 
 ## Rules any designer can use today
@@ -75,6 +75,16 @@ Signs that a screen was made by AI without a design system:
 - Through the figma-console bridge, `setTimeout` never fired in the plugin sandbox, and awaiting `loadFontAsync` one font at a time in a loop hung it. Preload fonts with one `Promise.all`.
 - A REST image export can show the file as it was minutes ago. Check the exported PNG itself and compare it with a fresh plugin capture.
 - `figma.currentPage` follows the person's live navigation. Resolve pages by name or id, never by assuming the current one.
+- Annotations live in the `node.annotations` property, and the file's categories in `figma.annotations`. There is no `getAnnotations()` or `setAnnotations()` method. Writing replaces the whole array, like `fills`.
+- `get_design_context` on the official Figma MCP server may leave annotations out to save tokens. For handoff specs, read `node.annotations` from the node itself.
+- A `use_figma` error is not a rollback. When its `safeToRetryWithoutCanvasRead` flag is `false`, part of the script may have applied: read the canvas, remove what the failed run left, then retry.
+
+## How the rules are checked
+
+- The gotchas come from production work, and a new one is accepted only with a symptom, a cause (or "not established"), the fix that ran and the month it was seen. The page "Why does my agent...?" (`docs/gotchas.md`) indexes them by symptom, in a designer's words.
+- `scripts/check_api.py` checks every Plugin API name the skills mention (`figma.*` chains, member names, enum values) against `@figma/plugin-typings` 1.140.0, so an invented or misspelled method fails the check before it ships. Names cited because they do not exist, such as `getAnnotations()`, are listed on purpose and must stay absent.
+- Unit tests check skill frontmatter, links between files, the file lock, the hook, the installer, and style and privacy patterns. CI runs them on macOS and Ubuntu.
+- Nothing in this project collects data or sends telemetry. The skills, the hook, the installer and the bridge scripts connect only to 127.0.0.1; the skill steps that read comments call the Figma API with the designer's own token. The one exception is the maintainer script `scripts/check_api.py`, which downloads the pinned typings from registry.npmjs.org.
 
 ## Which skills fit which setup
 
@@ -82,7 +92,7 @@ Signs that a screen was made by AI without a design system:
 | --- | --- |
 | No agent connected to Figma | The rules on this page. Optionally read `figma-handoff-gate` and `figma-slop-check` as checklists. |
 | Claude Code, Codex or Cursor with figma-console-mcp and Figma Desktop | Install all eight skills: `npx skills add thiagoxikota/figma-maxxing` |
-| Official Figma MCP server only (`use_figma`) | `figma-canon`, `figma-preflight`, `figma-slop-check`, `figma-handoff-gate`. Not validated by the author on that server. |
+| Official Figma MCP server only (`use_figma`) | `figma-canon`, `figma-preflight`, `figma-orient`, `figma-slop-check`, `figma-handoff-gate`. `figma-preflight`, `figma-slop-check` and `figma-handoff-gate` ran there once, in a blind demo; the others are untested on that server. |
 
 The skills:
 
@@ -99,6 +109,7 @@ The skills:
 
 - [README](https://raw.githubusercontent.com/thiagoxikota/figma-maxxing/main/README.md)
 - [README in Portuguese](https://raw.githubusercontent.com/thiagoxikota/figma-maxxing/main/docs/README.pt-BR.md)
+- [Why does my agent...?](https://raw.githubusercontent.com/thiagoxikota/figma-maxxing/main/docs/gotchas.md): the gotchas indexed by symptom, one line each, with a link to the fix
 - [figma-canon](https://raw.githubusercontent.com/thiagoxikota/figma-maxxing/main/skills/figma-canon/SKILL.md): hard rules and the index of every reference
 - [Handoff format](https://raw.githubusercontent.com/thiagoxikota/figma-maxxing/main/skills/figma-canon/references/handoff-format.md)
 - [State coverage](https://raw.githubusercontent.com/thiagoxikota/figma-maxxing/main/skills/figma-canon/references/state-coverage.md)
@@ -106,3 +117,4 @@ The skills:
 - [Naming canon](https://raw.githubusercontent.com/thiagoxikota/figma-maxxing/main/skills/figma-canon/references/naming-canon.md)
 - [Plugin API anomalies](https://raw.githubusercontent.com/thiagoxikota/figma-maxxing/main/skills/figma-canon/references/plugin-api-anomalies.md) and [field notes](https://raw.githubusercontent.com/thiagoxikota/figma-maxxing/main/skills/figma-canon/references/field-notes.md): long files, read only the entry you need
 - [figma-handoff-gate](https://raw.githubusercontent.com/thiagoxikota/figma-maxxing/main/skills/figma-handoff-gate/SKILL.md) and [figma-slop-check](https://raw.githubusercontent.com/thiagoxikota/figma-maxxing/main/skills/figma-slop-check/SKILL.md)
+- [Privacy](https://raw.githubusercontent.com/thiagoxikota/figma-maxxing/main/PRIVACY.md) and [security](https://raw.githubusercontent.com/thiagoxikota/figma-maxxing/main/SECURITY.md): what runs on your machine and what never leaves it

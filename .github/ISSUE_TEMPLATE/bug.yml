@@ -1,0 +1,31 @@
+name: Bug in a script, hook or installer
+description: install.py, the lock, the precheck hook, a bridge-doctor script or mcp-direct did the wrong thing.
+title: "Bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a security problem, do not use this form: [report it privately](https://github.com/thiagoxikota/figma-maxxing/security/advisories/new).
+  - type: input
+    id: script
+    attributes:
+      label: Script and command
+      placeholder: python3 install.py --target claude --scope user
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What you expected and what happened
+      description: Paste the output. Remove tokens, file keys and paths that name people or clients.
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Your environment
+      placeholder: macOS 15, Python 3.12, Node 22, Claude Code 2.1, figma-console-mcp 1.40.9, figma-maxxing 1.1.0
+    validations:
+      required: true

@@ -1,7 +1,12 @@
 name: Something depends on the author's setup
 description: A step, path or tool in a skill that does not exist on your machine.
+title: "Setup: "
 labels: [portability]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        These skills were written on one machine and then made portable. If a step assumes a path, a tool or a habit you do not have, that is a bug in the skill. Thanks for reporting it.
   - type: input
     id: skill
     attributes:
@@ -19,6 +24,6 @@ body:
     id: env
     attributes:
       label: Your environment
-      placeholder: macOS 15, Claude Code 2.1, figma-console-mcp 1.40.8
+      placeholder: macOS 15, Claude Code 2.1, figma-console-mcp 1.40.9
     validations:
       required: true
