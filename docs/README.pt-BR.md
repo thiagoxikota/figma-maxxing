@@ -141,7 +141,7 @@ Skill por skill: [works-with.md](works-with.md).
 
 O `npx skills add thiagoxikota/figma-maxxing` funciona com a maioria dos agentes. A CLI `skills` é de terceiros e envia contagem anônima de instalação; `DISABLE_TELEMETRY=1` desliga.
 
-Todas as rotas abaixo, menos a do Cursor, rodaram em 05/10/2026 numa pasta de teste limpa, e cada uma instalou as 8 skills. Claude Code, Codex e Copilot CLI instalaram a partir da main do GitHub, no commit 5afe295, antes da tag v1.1.0; no Claude Code, a instalação usou a CLI `claude plugin`, a versão de terminal dos dois comandos de barra. O Gemini CLI instalou a release v1.1.0. O `npx skills add thiagoxikota/figma-maxxing` rodou a partir do GitHub. O `-a opencode` e o `-a windsurf` rodaram a partir de uma cópia local do repositório.
+Todas as rotas abaixo, menos a do Cursor, rodaram em 05/10/2026 numa pasta de teste limpa, e cada uma instalou as 8 skills na versão 1.1.1. Claude Code, Codex, Copilot CLI e `npx skills add thiagoxikota/figma-maxxing` instalaram a partir da main do GitHub, no commit 3693845, o mesmo da tag v1.1.1; no Claude Code, a instalação usou a CLI `claude plugin`, a versão de terminal dos dois comandos de barra. O Gemini CLI instalou a release v1.1.1. O `-a opencode` e o `-a windsurf` rodaram mais cedo, no mesmo dia, a partir de uma cópia local do repositório.
 
 <details>
 <summary><b>Claude Code</b></summary>
@@ -186,7 +186,7 @@ Rodou com o Copilot CLI 1.0.61.
 gemini extensions install https://github.com/thiagoxikota/figma-maxxing
 ```
 
-Rodou com o Gemini CLI 0.43.0, que instalou a 1.1.0 a partir da última release do GitHub. Ele pede para você confiar na pasta e confirmar a instalação; o `--consent` responde as duas perguntas, e foi assim que o teste rodou.
+Rodou com o Gemini CLI 0.43.0, que instalou a 1.1.1 a partir da última release do GitHub. Ele pede para você confiar na pasta e confirmar a instalação; o `--consent` responde as duas perguntas, e foi assim que o teste rodou.
 
 </details>
 
@@ -328,7 +328,7 @@ Em 05/10/2026:
 
 - **Meu trabalho.** Construí estas skills no Claude Code, no macOS, com o figma-console-mcp, em arquivos reais. Esta edição pública é uma reescrita daquele conjunto: em inglês, generalizada e sem nenhum detalhe de cliente. Ainda não rodou de ponta a ponta numa segunda máquina.
 - **MCP oficial da Figma.** O teste às cegas lá de cima, numa tela de demonstração. A auditoria usou 12 chamadas ao MCP da Figma, a correção usou 13 e a segunda auditoria, mais 13. Alguns passos não tinham ferramenta lá ou esbarraram em limite: não há seleção, o `get_screenshot` não captura acima de 1x, não há status da bridge e cada chamada tem limite de 20 KB. Os agentes contornaram esses limites usando o `use_figma` só para ler, sem editar nada, e registraram cada contorno no [works-with.md](works-with.md#blind-demo-on-the-official-figma-mcp).
-- **Instalações.** Todas as rotas de [Instalar no seu agente](#instalar-no-seu-agente), menos o Cursor, a partir da main do GitHub, da release v1.1.0 ou de uma cópia local, como está descrito lá.
+- **Instalações.** Todas as rotas de [Instalar no seu agente](#instalar-no-seu-agente), menos o Cursor, a partir da main do GitHub, da release v1.1.1 ou de uma cópia local, como está descrito lá.
 
 Se alguma coisa ainda depender do meu ambiente, [abra uma issue](https://github.com/thiagoxikota/figma-maxxing/issues) com o seu ambiente e o erro exato.
 
