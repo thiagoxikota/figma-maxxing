@@ -1,5 +1,7 @@
 // figma-click-flow: full hardened overlay snippet.
 // Run inside `figma_execute` (figma-console MCP) or `use_figma` (official Figma MCP server).
+// The use_figma path is not validated by this repo; the guards below follow Figma's figma-use
+// skill (https://github.com/figma/mcp-server-guide), which documents that runtime.
 // Replace the four CONFIG lines below.
 // Verified API behavior (field note, 2026-05): SECTION children use local coords; createNodeFromSvg
 // returns a FRAME of vectors; figma.createConnector is not a function in design files.
@@ -32,7 +34,11 @@ const OVERLAY_NAME  = "flow-overlay · click-connectors";
 const ORIGIN_ANCHOR = "auto";
 // ==============================================================
 
-await figma.loadAllPagesAsync();
+// figma.loadAllPagesAsync() exists in the Desktop Bridge plugin (figma_execute). Figma's own
+// figma-use skill lists it as "Not implemented" in use_figma (official Figma MCP server), and a
+// missing member can throw there on access. So try it and go on without it: getNodeByIdAsync
+// resolves across pages, and setCurrentPageAsync below loads the page the section lives on.
+try { await figma.loadAllPagesAsync(); } catch (e) { /* use_figma: not implemented */ }
 
 const section = await figma.getNodeByIdAsync(SECTION_ID);
 if (!section) throw new Error(`Section ${SECTION_ID} not found`);
@@ -77,6 +83,10 @@ if (MODE === "explicit") {
 } else {
   // from-prototype: walk descendants for reactions
   section.findAll((n) => {
+    // SECTION, SLICE and COMPONENT_SET nodes declare no `reactions` (@figma/plugin-typings 1.140.0).
+    // use_figma throws on a read of a member the node type lacks, and `?.` does not prevent it,
+    // so test with `in` first. In figma_execute the same read returns undefined.
+    if (!("reactions" in n)) return false;
     const reactions = n.reactions;
     if (!reactions || !Array.isArray(reactions) || reactions.length === 0) return false;
     for (const r of reactions) {
@@ -103,6 +113,7 @@ if (pairs.length === 0) {
 
 // Filter pairs whose endpoints fall outside the section's absolute bounds
 const inSection = (n) => {
+  if (!("absoluteBoundingBox" in n)) return false; // a PAGE id passed by hand has no box
   const ab = n.absoluteBoundingBox;
   if (!ab) return false;
   const cx = ab.x + ab.width / 2;

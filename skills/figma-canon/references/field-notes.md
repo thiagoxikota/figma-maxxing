@@ -869,7 +869,7 @@ detector.
      whoever re-triggers last wins). After pairing, check `figma_get_status` from every session
      that needs the bridge.
   4. **Call:** use
-     the client in `figma-bridge-doctor/scripts/mcp-direct/` (`fx.py`, `shot.py`), which sends the
+     the client in [`figma-bridge-doctor/scripts/mcp-direct/`](../../figma-bridge-doctor/scripts/mcp-direct/) (`fx.py`, `shot.py`), which sends the
      bearer token the daemon writes to its state dir and `content-type: application/json`. The
      daemon refuses any request without both, and any request that carries an `Origin` header.
      A screenshot comes back as `content[].type === "image"` in base64. Decode it to a file

@@ -6,7 +6,7 @@ Severity says how much it hurts. **Class says what to do.** Every finding carrie
 
 ## Severity ladder
 
-- **Critical:** the patterns rated Critical in the Severity scoring table of `figma-canon/references/ai-slop-signatures.md` (WCAG auto-fails, default Figma names), a frame collapsed completely (width=1 or height=0), and a gate closed without the visual verification. Hardcoded colors, missing auto layout and detached instances are High in the punch list (as in that table), but they are auto-fails of `figma-canon/references/quality-rubric.md`, so any one of them still blocks a PASS.
+- **Critical:** the patterns rated Critical in the Severity scoring table of [`figma-canon/references/ai-slop-signatures.md`](../../figma-canon/references/ai-slop-signatures.md) (WCAG auto-fails, default Figma names), a frame collapsed completely (width=1 or height=0), and a gate closed without the visual verification. Hardcoded colors, missing auto layout and detached instances are High in the punch list (as in that table), but they are auto-fails of [`figma-canon/references/quality-rubric.md`](../../figma-canon/references/quality-rubric.md), so any one of them still blocks a PASS.
 - **High:** breaks explicit canon (a raw hex where a token exists, a glossary violation, padding outside the scale).
 - **Medium:** drift between sibling frames (off-by-1, capitalization variance, icon size mismatch).
 - **Low:** naming drift that does not affect the render (a layer name outside the canon while the frame is visually correct).
@@ -132,14 +132,14 @@ The user says "remove exc-003" or "revoke that exception": remove the entry. No 
 - **A real component spec with many fields.** The density check targets meta cards about a flow, not a component spec that legitimately needs more fields.
 - **The user asked for it.** A request for a "detailed", "complete" or "exhaustive" list turns the density check off. A request for a summary turns the trailing summary check off. Work on a pull request document (not chat) turns the markdown header check off.
 
-Before calling any card slop, inconsistent or dead space, apply the Sibling-check rule of `figma-canon/references/ai-slop-signatures.md`: inspect at least 2 siblings of the same class. The flagged item is often the canon.
+Before calling any card slop, inconsistent or dead space, apply the Sibling-check rule of [`figma-canon/references/ai-slop-signatures.md`](../../figma-canon/references/ai-slop-signatures.md): inspect at least 2 siblings of the same class. The flagged item is often the canon.
 
 ## How to cite the canon
 
 Every finding must point to where the expected value is written. Use the sources in this order, preferring the most structured one available:
 
 1. **Machine-readable registries** of tokens and components, when the project has them.
-2. **The project's design docs and the project map** (`figma-map.md`): token docs (color, typography, spacing, radius, elevation, motion), the component inventory with its variants, the glossary and voice guide, the layer naming convention. For layer naming with no project rule, cite `figma-canon/references/naming-canon.md`.
+2. **The project's design docs and the project map** (`figma-map.md`): token docs (color, typography, spacing, radius, elevation, motion), the component inventory with its variants, the glossary and voice guide, the layer naming convention. For layer naming with no project rule, cite [`figma-canon/references/naming-canon.md`](../../figma-canon/references/naming-canon.md).
 3. **The file's Figma variables.** They are the live source of truth for tokens. Use them when the registry and the docs diverge, and resolve the difference before reporting the finding.
 
 For a live component count, call `figma_get_design_system_summary` instead of quoting a number written in a doc.

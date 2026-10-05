@@ -36,10 +36,14 @@ const SERVER = process.env.FIGMA_MCP_ENTRY || (() => {
   // Do NOT sort by mtime: a `ls -t` lookup once picked a 1.35.0 cache (newest mtime, OLDEST
   // version; field note, 2026-09), its server rewrote ~/.figma-console-mcp/plugin/ with the
   // old bundle, and the plugin in Figma started announcing "update available". Sort by SEMVER.
-  let npmCache = '';
-  try {
-    npmCache = execSync('npm config get cache', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-  } catch { /* npm not on PATH: fall back to npm's default cache dir */ }
+  // npm exports npm_config_cache to the processes it starts; read it first and ask npm only
+  // when it is absent. Set FIGMA_MCP_ENTRY to skip this lookup entirely.
+  let npmCache = process.env.npm_config_cache || '';
+  if (!npmCache) {
+    try {
+      npmCache = execSync('npm config get cache', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    } catch { /* npm not on PATH: fall back to npm's default cache dir */ }
+  }
   if (!npmCache) npmCache = join(homedir(), '.npm');
   const npxDir = join(npmCache, '_npx');
   let hashes = [];

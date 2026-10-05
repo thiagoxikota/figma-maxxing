@@ -8,9 +8,14 @@ description: >-
   Run figma-slop-check first. Use when the user says "ready for handoff", "dev-tag", "release
   section", "spec card", "run the handoff gate", or in Portuguese "pronto pra handoff".
 license: MIT
+compatibility: >-
+  Read-only until a fix is approved. Detector snippets are Plugin API JavaScript written for
+  figma_execute (figma-console-mcp, Desktop Bridge plugin in Figma Desktop). The official Figma
+  MCP server's use_figma also runs Plugin API JavaScript, but this gate was not validated there.
+  Reads the figma-canon skill; approved fixes go through figma-preflight.
 metadata:
   author: Thiago Xikota
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # figma-handoff-gate
@@ -29,7 +34,7 @@ The detector snippets below are Plugin API JavaScript. Run them through `figma_e
 
 ## Validates against handoff-format.md canon
 
-The canon is `figma-canon/references/handoff-format.md`. Its "Terms" section (`figma-canon/references/handoff-format.md#terms`) defines spec card, caption and note card, the three surfaces these checks name.
+The canon is [`figma-canon/references/handoff-format.md`](../figma-canon/references/handoff-format.md). Its "Terms" section ([`figma-canon/references/handoff-format.md#terms`](../figma-canon/references/handoff-format.md#terms)) defines spec card, caption and note card, the three surfaces these checks name.
 
 Required checks (all must pass). Report a broken requirement as `[BLOCKER]`. Report an item that a check only asks you to flag (for example a gap over 120px in check 1) as `[WARN]`. Any finding of either level puts the result in the FAIL template, which lists both as issues before ship.
 
@@ -41,7 +46,7 @@ Required checks (all must pass). Report a broken requirement as `[BLOCKER]`. Rep
   - `ROW_GAP_V` = 200px (cluster row to next cluster row)
   - `SECTION_TITLE_CLEARANCE` = 48px
 - Sections without per-screen annotations: uniform spacing of at least 80px between handoff frames, no tight clustering (under 60px = fail), no excess gaps (over 120px = flag)
-- See `figma-canon/references/handoff-format.md#spacing-canon` for the full table
+- See [`figma-canon/references/handoff-format.md#spacing-canon`](../figma-canon/references/handoff-format.md#spacing-canon) for the full table
 
 ### 2. Frame-name clearance
 
@@ -54,7 +59,7 @@ Required checks (all must pass). Report a broken requirement as `[BLOCKER]`. Rep
 - Badge + title: HUG horizontal frame
 - Body + triggers: AUTO + FILL vertical frame
 - NOT all-FILL inside HUG (the caption FILL-in-HUG overflow bug)
-- See `figma-canon/references/handoff-format.md` for the diagram
+- See [`figma-canon/references/handoff-format.md`](../figma-canon/references/handoff-format.md) for the diagram
 
 ### 4. Caption visual
 
@@ -69,7 +74,7 @@ Required checks (all must pass). Report a broken requirement as `[BLOCKER]`. Rep
 - Each bullet = `deliverable + value`
 - NO internal jargon: ticket codes (`TICKET-123`), internal tool names ("the v2 validator"), registry or rule codes, and the like
 - NO `@user_NNN` placeholders (use realistic names or strip)
-- NO AI-stuffed verbose explanations. Check the copy against "Hype copy ban" in `figma-canon/references/ai-slop-signatures.md`
+- NO AI-stuffed verbose explanations. Check the copy against "Hype copy ban" in [`figma-canon/references/ai-slop-signatures.md`](../figma-canon/references/ai-slop-signatures.md)
 
 ### 6. Screen-count integrity
 
@@ -81,12 +86,12 @@ Required checks (all must pass). Report a broken requirement as `[BLOCKER]`. Rep
 
 - Hover / disabled / loading / error states live in Component variant sets
 - NOT as raw frames in the delivered handoff
-- See `figma-canon/references/handoff-format.md#state-variants-live-in-component-sets`, and your project's own build skill or workflow, if any
+- See [`figma-canon/references/handoff-format.md#state-variants-live-in-component-sets`](../figma-canon/references/handoff-format.md#state-variants-live-in-component-sets), and your project's own build skill or workflow, if any
 
 ### 8. 4-lens critique stamped
 
 - Has the work been viewed through the dev / designer / PM / CEO lenses?
-- See `figma-canon/references/handoff-format.md#4-lens-pre-ship-critique-mandatory` for the questions of each lens
+- See [`figma-canon/references/handoff-format.md#4-lens-pre-ship-critique-mandatory`](../figma-canon/references/handoff-format.md#4-lens-pre-ship-critique-mandatory) for the questions of each lens
 - Each lens catches a different gap class
 - Stamped means written down. If the conversation holds no record of the critique, run the four lenses now and print one line per lens in the gate output: what it found, or "none". That printed block is the stamp.
 
@@ -94,12 +99,12 @@ Required checks (all must pass). Report a broken requirement as `[BLOCKER]`. Rep
 
 - If the project has a localization rule, it is applied consistently across the whole handoff. For example, a project may keep the Figma source in one language and leave the others to app localization. Do not mix locales in one handoff.
 - No placeholders such as `@user_123`: replace them with realistic names in the file's language.
-- See `figma-canon/references/handoff-format.md#project-locale-and-sample-names`
+- See [`figma-canon/references/handoff-format.md#project-locale-and-sample-names`](../figma-canon/references/handoff-format.md#project-locale-and-sample-names)
 
 ### 10. Self-correction in reports
 
 - If the gate is for a stakeholder report deliverable: no bullets exposing your own audit/fix history
-- See `figma-canon/references/handoff-format.md#reports--comms` and "Self-corrections in reports" in `figma-canon/references/ai-slop-signatures.md`
+- See [`figma-canon/references/handoff-format.md#reports--comms`](../figma-canon/references/handoff-format.md#reports--comms) and "Self-corrections in reports" in [`figma-canon/references/ai-slop-signatures.md`](../figma-canon/references/ai-slop-signatures.md)
 - Each bullet = deliverable + value, not internal jargon
 
 ### 11. Em dash + curly quote sweep (mandatory)
@@ -137,30 +142,30 @@ return nodes
 - Continuity states (post-success return with the draft preserved) included
 - Linked destinations (for example a policy page behind a "Why this rule?" link) included as separate frames
 - Group with section labels: "Main flow", "Variants" (on a detection feature, "Detection variants"), "Edge cases", "Continuity"
-- Required states per screen class: `figma-canon/references/state-coverage.md`
+- Required states per screen class: [`figma-canon/references/state-coverage.md`](../figma-canon/references/state-coverage.md)
 
 ### 13. Annotation contrast (dark notes on light screens)
 
 - When the handoff shows light/white mockups, note cards and panels must be dark themed
 - This creates visual hierarchy between "the design" and "meta-content about the design"
 - Use the project's own dark tokens. With none, use these neutral values: card background `#16181D`, stroke `#2A2E37`, title `#FFFFFF`, body `#C4C8D0`
-- Accents: two accent colors from the project's tokens, one for the label and one for the `Why:` / `Edge:` prefixes (for example a green and an amber). With no project accent, use `#E5484D` (configurable) for the label. With no second accent, reuse the label accent for the prefixes, as `figma-canon/references/handoff-format.md` specifies.
+- Accents: two accent colors from the project's tokens, one for the label and one for the `Why:` / `Edge:` prefixes (for example a green and an amber). With no project accent, use `#E5484D` (configurable) for the label. With no second accent, reuse the label accent for the prefixes, as [`figma-canon/references/handoff-format.md`](../figma-canon/references/handoff-format.md) specifies.
 
 ### 14. Annotation pattern (2026-05-25, cross-project canon)
 
 - Annotations live in a **right-side column** per screen, top-aligned, 320px wide, 80px gap from the screen edge
-- Each note card uses the `HandoffNote` component instance (NOT raw frames). No prebuilt component ships with these skills: if the file has no annotation component, build one once from the spec in `figma-canon/references/handoff-format.md`, then reuse instances
+- Each note card uses the `HandoffNote` component instance (NOT raw frames). No prebuilt component ships with these skills: if the file has no annotation component, build one once from the spec in [`figma-canon/references/handoff-format.md`](../figma-canon/references/handoff-format.md), then reuse instances
 - Copy voice: `When [trigger], [outcome].` (a human sentence: subject + verb + condition)
 - Schema: label + WHEN + WHAT (always) + WHY (only when non-obvious) + EDGE (only when the state varies)
 - Card density 30-100 words. Over 100 = split. Under 20 while the developer needs more = add WHY/EDGE
-- See `figma-canon/references/handoff-format.md#annotation-pattern-cross-project-canon-2026-05-25`
+- See [`figma-canon/references/handoff-format.md#annotation-pattern-cross-project-canon-2026-05-25`](../figma-canon/references/handoff-format.md#annotation-pattern-cross-project-canon-2026-05-25)
 
 ### 15. Action-completeness / flow closure (mandatory, the "no orphan actions" check)
 
 The single most-repeated miss (field note, 2026-05: a developer saw an "add" action drawn and had to ask how removing would work). The developer builds exactly what is drawn: **every visual action needs its outcome drawn**, or the developer has to guess.
 
 - **Enumerate, don't eyeball.** For each new or changed screen, `findAll` every interactive element: buttons, CTAs, icon buttons, **info/help (i) icons**, toggles, radio/checkbox rows, list rows (tappable), chips, links, kebab/overflow menus, swipe affordances, FABs. List them.
-  - No node type means "interactive", so build the list in two passes. First the wired nodes: `screen.findAll(n => n.reactions && n.reactions.length > 0)` (reactions live on nested children, not on the screen frame root: see "Prototype reads" in `figma-canon/references/plugin-api-anomalies.md`). Then walk the screen for the element types above that are drawn but not wired, by layer and component names and by eye. An unwired control is exactly what this check hunts.
+  - No node type means "interactive", so build the list in two passes. First the wired nodes: `screen.findAll(n => n.reactions && n.reactions.length > 0)` (reactions live on nested children, not on the screen frame root: see "Prototype reads" in [`figma-canon/references/plugin-api-anomalies.md`](../figma-canon/references/plugin-api-anomalies.md)). Then walk the screen for the element types above that are drawn but not wired, by layer and component names and by eye. An unwired control is exactly what this check hunts.
   - Print each candidate as node id + name. The audit mode of `figma-preflight` ("Cross-screen flow") cross-checks the same screens for dangling CTAs and dead ends.
 - For EACH, name the designed outcome (a frame / sheet / state in the file). If the outcome does not exist as an artifact: **FAIL** (orphan action).
 - **Inverse-pair law:** if one direction exists, its inverse MUST exist. Add / Remove, Assign / Unassign, Open / Close or Dismiss, Enable / Disable, Mute / Unmute, Ban / Unban, Expand / Collapse, Follow / Unfollow, Pin / Unpin, Approve / Reject, Block / Unblock. An "Add another item" button with no remove path = FAIL.
@@ -177,7 +182,7 @@ Calibrated on a client handoff (field note, 2026-07). Rule: nothing in a deliver
 
 - **Zero process log on the canvas:** no QA log, no fix list, no "adversarial pass", no "sprint", no session changelog. Process notes (QA log, fix list) live outside the Figma file, in a project file of your choice or in the agent's own memory system if it has one, never in a visible frame.
 - **Zero mention of a review or AI tool:** ChatGPT, "external review/judgment", skill or pipeline names. A recommendation on a board is written in the designer's voice ("my recommendation is..."), never "reviews recommend".
-- **Layout grids OFF** on every delivered frame. Clones inherit visible grids and the canvas takes on an assembly-line look. Hide the grids and keep their definitions by reassigning a modified copy, the same clone-mutate-reassign pattern as fills (see `figma-canon/references/plugin-api-core.md`): `frame.layoutGrids = frame.layoutGrids.map(g => ({ ...g, visible: false }))`.
+- **Layout grids OFF** on every delivered frame. Clones inherit visible grids and the canvas takes on an assembly-line look. Hide the grids and keep their definitions by reassigning a modified copy, the same clone-mutate-reassign pattern as fills (see [`figma-canon/references/plugin-api-core.md`](../figma-canon/references/plugin-api-core.md)): `frame.layoutGrids = frame.layoutGrids.map(g => ({ ...g, visible: false }))`.
 - **Context boards belong to the designer:** architecture, behavior contracts, handoff notes. Those stay. What leaves is the trace of HOW the work was produced.
 - **Mechanical sweep:** collect the TEXT nodes of the page with `page.findAllWithCriteria({ types: ["TEXT"] })` and match them against a term list (ChatGPT, GPT, adversarial, fix list, sprint, QA, external review, prompt, plus the names of the AI tools, skills and pipelines your own process used), then triage the hits by hand. On a large page, raise the `figma_execute` timeout (default 5000 ms, maximum 30000 ms). Watch for false positives: "This is a prompt message." is the prompt slot of an iOS navigation bar, and a place name can contain "AI" as a substring ("Mumbai").
 - **Process artifacts** (review exports such as a zip of renders, file manifests, review verdicts) are PRIVATE to the designer. They never travel with the handoff.
@@ -194,7 +199,7 @@ The checks above measure STRUCTURE. None of them measures USE, and all of them i
 figma.currentPage.flowStartingPoints.map(f => f.nodeId)
 ```
 
-and confirm that the screens you are going to present are in the result. Flow starting points belong to a page, and `figma.currentPage` is whatever page is active, which another session or the designer can switch. Make sure the page that holds the prototype is the active one first (re-assert it from a known node, as in "findAllWithCriteria runs on figma.currentPage" in `figma-canon/references/plugin-api-anomalies.md`).
+and confirm that the screens you are going to present are in the result. Flow starting points belong to a page, and `figma.currentPage` is whatever page is active, which another session or the designer can switch. Make sure the page that holds the prototype is the active one first (re-assert it from a known node, as in "findAllWithCriteria runs on figma.currentPage" in [`figma-canon/references/plugin-api-anomalies.md`](../figma-canon/references/plugin-api-anomalies.md)).
 
 **17c. Simulate the recipient, in writing.** Before sending, answer as the recipient:
 
@@ -258,6 +263,6 @@ If frames are mutated AFTER a gate pass, re-run the gate before re-declaring don
 ## Composes with
 
 - `figma-slop-check`: runs BEFORE this gate (machine-made tells and precision pass first)
-- `figma-canon`: this gate reads `figma-canon/references/handoff-format.md` (every check) + `figma-canon/references/ai-slop-signatures.md` (checks 5 and 10: "Hype copy ban" and "Self-corrections in reports")
+- `figma-canon`: this gate reads [`figma-canon/references/handoff-format.md`](../figma-canon/references/handoff-format.md) (every check) + [`figma-canon/references/ai-slop-signatures.md`](../figma-canon/references/ai-slop-signatures.md) (checks 5 and 10: "Hype copy ban" and "Self-corrections in reports")
 - `figma-preflight`: gates every approved apply-fix write, and its audit mode cross-checks check 15
 - Your project's own build skill or workflow, if any: this gate is the final gate, after `figma-slop-check`. If such a workflow exists, it writes component descriptions and this gate does not. Either way, this gate validates frame layout and spec cards, and check 11 sweeps descriptions for dashes and curly quotes

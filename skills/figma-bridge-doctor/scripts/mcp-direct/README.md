@@ -4,6 +4,10 @@ Fallback for when the figma-console tools **do not exist in the session** (a lay
 Claude Code freezes the tool list at session start). It talks to `figma-console-mcp` over stdio,
 without depending on the MCP registration and without asking the user for a `/mcp` reconnect.
 
+**Opt-in.** The daemon is a local HTTP proxy that can run any figma-console tool against the open
+Figma file. An agent starts it only after telling the user what it is and getting an explicit yes,
+and stops it when the task is done. When to reach for it: [layer 1 recovery](../../references/layer1-recovery.md).
+
 Run these from this directory (`scripts/mcp-direct/` inside the `figma-bridge-doctor` skill):
 
 ```bash
@@ -75,8 +79,9 @@ The cache directory is resolved at runtime as `$(npm config get cache)/_npx`, be
 cache location differs per machine.
 
 After starting this daemon, check `bash ../figma-status.sh | grep plugin_`: `plugin_drift=true`
-means some server downgraded the disk. The fix is in the skill, [SKILL.md](../../SKILL.md),
-section "Plugin version: THREE layers, and the banner does not say the direction".
+means some server downgraded the disk. The fix is in the skill:
+[references/plugin-version-drift.md](../../references/plugin-version-drift.md), section "Plugin
+version: THREE layers, and the banner does not say the direction".
 
 ## Platform
 

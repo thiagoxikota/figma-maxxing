@@ -51,6 +51,8 @@ RISKY sits outside the four tiers: the CVE is patched, but the server has had no
 | Publish library updates | Full + library owner permission |
 | Delete components / variables | Full + confirmation |
 
+Source for the two write rows: Figma's [MCP server FAQ](https://help.figma.com/hc/en-us/articles/39252411778583-Figma-MCP-server-FAQs), checked 2026-10-05 ("A Full Seat is required to write to Figma files outside of drafts"; a Dev seat is read-only outside its own drafts). Figma's write-to-canvas page states the Full seat rule without the drafts exception, so a Dev seat writing to a draft is the documented case, not a tested one.
+
 Never attempt a write that the seat does not allow (for example a Dev seat writing to a non-draft file). Check the seat first with `whoami` (step 0 in `references/inspect-protocol.md`).
 
 ## Draft-first policy

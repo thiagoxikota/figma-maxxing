@@ -9,9 +9,14 @@ description: >-
   user asks to create, edit, build or instantiate anything in Figma, or asks "audit the flow",
   "audita o fluxo", "tem tela órfã?", "esse botão leva pra onde?".
 license: MIT
+compatibility: >-
+  Gate for writes through figma-console-mcp (figma_execute, Desktop Bridge plugin in Figma
+  Desktop) or through the official Figma MCP server (use_figma, Full seat, not validated by this
+  repo). The file lock script needs Python 3 (standard library only). Reads the figma-canon
+  skill. The optional local evidence script of figma-bridge-doctor is macOS only.
 metadata:
   author: Thiago Xikota
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # figma-preflight
@@ -65,8 +70,10 @@ Two paths pass this check. Only an MCP call proves the connection: a shell comma
   `get_metadata` on the target (that call also satisfies Check 2). Write path: `use_figma`. Path B
   is not validated by this repo: keep writes small, read back every change. Follow the official
   server's own instructions for `use_figma`.
-- `figma-bridge-doctor/scripts/figma-status.sh` (in the `figma-bridge-doctor` skill's `scripts/`
-  directory, macOS only) is LOCAL evidence only: Figma is running, servers are listening. By
+- [`figma-bridge-doctor/scripts/figma-status.sh`](../figma-bridge-doctor/scripts/figma-status.sh) (in the `figma-bridge-doctor` skill's `scripts/`
+  directory, macOS only; in Claude Code run it as
+  `bash "${CLAUDE_SKILL_DIR}/../figma-bridge-doctor/scripts/figma-status.sh"`, which needs that skill
+  installed next to this one) is LOCAL evidence only: Figma is running, servers are listening. By
   design it does not report pairing (it prints `current_file_pairing=ask_figma_get_status`). Use
   it for diagnosis, not as a verdict.
 - If neither path confirms the connection, the write MUST be blocked. Bridge recovery goes through
@@ -131,7 +138,7 @@ sweep closes the work: zero ad hoc icons on the page is the proof. "I replaced N
 
 ### Check 5: figma-canon refs loaded
 
-- Required refs per context (files under `figma-canon/references/`):
+- Required refs per context (files under [`figma-canon/references/`](../figma-canon/references)):
   - Any write: `plugin-api-core.md` + `figma-execute-atomicity.md` + `auto-layout-canon.md`
   - Write touches tokens, variables, annotations or images: + `plugin-api-data.md`
   - Write hits edge cases (sections, connectors, masters, image fills, rate limits):
@@ -145,21 +152,23 @@ sweep closes the work: zero ad hoc icons on the page is the proof. "I replaced N
 
 - For new screen creation: which states are required (for example Empty / Loading / Error /
   Success / Edge; the decision table gives the full set per screen class)?
-- Use the decision table in `figma-canon/references/state-coverage.md`.
+- Use the decision table in [`figma-canon/references/state-coverage.md`](../figma-canon/references/state-coverage.md).
 - If the states are not explicitly planned: ask the user OR stop and clarify.
 
 ### Check 7: Figma file lock claimed (single-driver invariant)
 
-One Figma file has one writer at a time. The lock script is `figma_lock.py` in this skill's
-`scripts/` directory (Python 3, standard library only). The commands below are written relative
-to this skill's directory. Run them from this skill's directory, or replace `scripts/` with the
-absolute path of this skill's `scripts/` directory.
+One Figma file has one writer at a time. The lock script is
+[`scripts/figma_lock.py`](scripts/figma_lock.py) in this skill (Python 3, standard library only).
+The commands below call it as `"${CLAUDE_SKILL_DIR}/scripts/figma_lock.py"`. Claude Code replaces
+`${CLAUDE_SKILL_DIR}` with this skill's directory (the folder that holds this file) when it loads
+the skill. Other agents: if the text still shows `${CLAUDE_SKILL_DIR}`, put the absolute path of
+that folder in its place; never run a command with the variable empty.
 
 ```bash
-python3 scripts/figma_lock.py claim <fileKey> --agent <agent> --task <task> [--ttl 1800]
-python3 scripts/figma_lock.py check <fileKey>
-python3 scripts/figma_lock.py release <fileKey> --agent <agent> --task <task>
-python3 scripts/figma_lock.py sweep
+python3 "${CLAUDE_SKILL_DIR}/scripts/figma_lock.py" claim <fileKey> --agent <agent> --task <task> [--ttl 1800]
+python3 "${CLAUDE_SKILL_DIR}/scripts/figma_lock.py" check <fileKey>
+python3 "${CLAUDE_SKILL_DIR}/scripts/figma_lock.py" release <fileKey> --agent <agent> --task <task>
+python3 "${CLAUDE_SKILL_DIR}/scripts/figma_lock.py" sweep
 ```
 
 How the script behaves:
@@ -198,10 +207,10 @@ The gate:
 
 - Resolve the `fileKey` from the Figma URL, `figma_get_status`, or the `figma-map.md` written by
   `figma-orient` (default `docs/figma-map.md`, or the agent's own memory system).
-- Diagnosis only: `python3 scripts/figma_lock.py check <fileKey>`. A free check does not reserve
+- Diagnosis only: `python3 "${CLAUDE_SKILL_DIR}/scripts/figma_lock.py" check <fileKey>`. A free check does not reserve
   the file. Only a successful claim authorizes you to proceed.
 - If `held=false`: claim it with
-  `python3 scripts/figma_lock.py claim <fileKey> --agent <agent> --task <task> --ttl 1800`.
+  `python3 "${CLAUDE_SKILL_DIR}/scripts/figma_lock.py" claim <fileKey> --agent <agent> --task <task> --ttl 1800`.
 - If `held=true` and you ARE the holder (`agent` and `task` match): proceed.
 - If `held=true` and you are NOT the holder: BLOCK the write. Surface who holds it and tell the
   user to either wait until `expires_at` or release the conflicting lock manually. Do NOT bypass.
@@ -210,10 +219,10 @@ The gate:
   `FIGMA_LOCK_AGENT` and `FIGMA_LOCK_TASK`). An abrupt death without cleanup depends on TTL
   expiry. Never release the lock of another task.
 - Release after the write completes:
-  `python3 scripts/figma_lock.py release <fileKey> --agent <agent> --task <task>`.
+  `python3 "${CLAUDE_SKILL_DIR}/scripts/figma_lock.py" release <fileKey> --agent <agent> --task <task>`.
 - One isolated script error (for example `{"error": "lock directory is busy"}`) does not declare
   the gate broken. Re-test. Only proceed without a lock when
-  `figma-bridge-doctor/scripts/figma-status.sh` shows `other_sessions_count=0`, and flag it in
+  [`figma-bridge-doctor/scripts/figma-status.sh`](../figma-bridge-doctor/scripts/figma-status.sh) shows `other_sessions_count=0`, and flag it in
   your reply. That script is macOS only, and it tells this session's MCP server apart from the
   others through the agent's process tree (environment variable `FIGMA_AGENT_PROCESS`, default
   `claude`; see the script's header). Where it cannot run or cannot show
@@ -240,8 +249,9 @@ Who may override:
   - write by node-id only
   - NEVER call `setCurrentPageAsync`
   - at the end of the batch, run the rival-write audit of the `figma-bridge-doctor` skill
-    (section "After reconnecting in a WRITE session: rival-write audit") on the section you
-    wrote, and report the result
+    (section "After reconnecting in a WRITE session: rival-write audit", full text in
+    [`figma-bridge-doctor/references/rival-write-audit.md`](../figma-bridge-doctor/references/rival-write-audit.md))
+    on the section you wrote, and report the result
   - state the override in your reply so it stays in the transcript, including the sentence
     "I wrote under a lock override"
 
@@ -291,9 +301,9 @@ the transcript.
 After the preflight OK, BEFORE generating any JS for `figma_execute` (or `use_figma` on path B):
 
 1. Load the refs required by Check 5 (the single list lives there), plus
-   `figma-canon/references/naming-canon.md` if there is a new layer.
+   [`figma-canon/references/naming-canon.md`](../figma-canon/references/naming-canon.md) if there is a new layer.
 2. When the write finishes (or aborts): release the lock with
-   `python3 scripts/figma_lock.py release <fileKey> --agent <agent> --task <task>`. Forgetting to
+   `python3 "${CLAUDE_SKILL_DIR}/scripts/figma_lock.py" release <fileKey> --agent <agent> --task <task>`. Forgetting to
    release blocks future sessions until the TTL expires.
 3. Never send the known failing patterns: a sync `figma.currentPage = X` assignment, a missing
    `await` on an async call, `figma.notify()`, `setPluginData`, `createConnector`. The optional

@@ -8,16 +8,21 @@ description: >-
   user asks for a "click flow", "flow arrows", "wire screens", "turn this into a flow", or in
   Portuguese "vira em fluxo", "setas do fluxo".
 license: MIT
+compatibility: >-
+  Writes to a Figma Design file through figma-console-mcp (figma_execute, Desktop Bridge plugin
+  in Figma Desktop) or through the official Figma MCP server (use_figma, Full seat, not
+  validated by this repo; the recipe guards figma.loadAllPagesAsync, which Figma lists as not
+  implemented there). Requires the figma-canon and figma-preflight skills.
 metadata:
   author: Thiago Xikota
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # figma-click-flow: Click-flow handoff overlay
 
 Draws a printed user-flow overlay on a section of laid-out screens. Each connection: a red dot at the click target on screen A, an elbow line with rounded corners ending in an open arrow at screen B's nearest edge. Reference look: a flow section of one production file.
 
-**REQUIRED PREREQUISITE:** load `figma-canon` + pass `figma-preflight` before any `figma_execute` write (the write path is the figma-console MCP server through its Desktop Bridge plugin). With only the official Figma MCP server connected, the write goes through `use_figma` on path B of `figma-preflight` Check 0 (not validated by this repo: keep writes small, read back every change), and Phase 4 validates with `get_screenshot` within the budget in `figma-canon/references/rate-limit-recovery.md`.
+**REQUIRED PREREQUISITE:** load `figma-canon` + pass `figma-preflight` before any `figma_execute` write (the write path is the figma-console MCP server through its Desktop Bridge plugin). With only the official Figma MCP server connected, the write goes through `use_figma` on path B of `figma-preflight` Check 0 (not validated by this repo: keep writes small, read back every change), and Phase 4 validates with `get_screenshot` within the budget in [`figma-canon/references/rate-limit-recovery.md`](../figma-canon/references/rate-limit-recovery.md).
 
 ## Why a separate skill (not createConnector)
 
@@ -47,7 +52,7 @@ Verified against a reference node in one production file. `refConn` in the right
 | Path | Elbow with **rounded corners**, R = 12 px | `connectorLineType: 'ELBOWED'` + visual radius pixel-picked |
 | Origin marker | Filled circle, r = 5 px (10 px diameter) | `connectorStartStrokeCap: 'CIRCLE_FILLED'` |
 | End cap | Open arrow, two strokes back from tip at ±28°, length 12 px | `connectorEndStrokeCap: 'ARROW_LINES'` |
-| Layer name | `flow-overlay · click-connectors` (kebab-case with a middle-dot separator, from one project's own layer canon; keep this exact name, because the rerun and the cleanup snippet find the overlay by it) | `figma-canon/references/naming-canon.md` |
+| Layer name | `flow-overlay · click-connectors` (kebab-case with a middle-dot separator, from one project's own layer canon; keep this exact name, because the rerun and the cleanup snippet find the overlay by it) | [`figma-canon/references/naming-canon.md`](../figma-canon/references/naming-canon.md) |
 
 The stroke color `#E5484D` is a neutral default and is configurable: override it through the `strokeColor` input (`STROKE_COLOR` in the recipe) when the file has a brand-specific accent.
 
@@ -92,6 +97,8 @@ If user just says "wire it up" with no detail, default to `mode: from-prototype`
 
 Walk up to the page ancestor (sections may be nested inside sections), call `figma.loadAllPagesAsync()`, then `await figma.setCurrentPageAsync(pageNode)`. Use `figma.getNodeByIdAsync` exclusively: sync `getNodeById` errors under `documentAccess: dynamic-page`.
 
+Server note for `use_figma` (official Figma MCP server): Figma's figma-use skill lists `figma.loadAllPagesAsync()` as not implemented in that runtime, and says a read of a member the node type does not have throws `TypeError: node.X: no such property 'X' on Y node`, optional chaining included ([figma/mcp-server-guide](https://github.com/figma/mcp-server-guide), read 2026-10). So the recipe calls `figma.loadAllPagesAsync()` inside `try`/`catch` and carries on without it (`setCurrentPageAsync` loads the page anyway), and it checks `"reactions" in n` before reading `reactions`, because SECTION, SLICE and COMPONENT_SET nodes do not declare it. In `figma_execute` both guards change nothing. This repo has not run the recipe on `use_figma`.
+
 ### Phase 1: Discover pairs
 
 Walk descendants of the section. For each node, inspect `reactions[]`, and in each reaction read `actions[]` (the recipe falls back to the singular `action` field when `actions` is absent). Collect a pair when:
@@ -131,13 +138,13 @@ Coord-space rule (verified): SECTION children use **section-local** coords. Afte
 
 `vectorPaths.windingRule: 'NONE'` is accepted by the API (verified). Auto-fit moves a vector to its path's leftmost coord after `vectorPaths` is set; trust this rather than fighting it.
 
-See `references/draw-overlay.js` for the complete hardened snippet. The same snippet also runs in `use_figma` of the official Figma MCP server; the timeout figures below are for `figma_execute` only.
+See [`references/draw-overlay.js`](references/draw-overlay.js) for the complete hardened snippet. The same snippet is written to run in `use_figma` of the official Figma MCP server too, with the guards described in Phase 0 (not validated on that server by this repo); the timeout figures below are for `figma_execute` only.
 
-`figma_execute` has a default timeout of 5000 ms and accepts up to 30000 ms. After a timeout or an error, do not rerun at once: this recipe removes the prior overlay and then draws a new one, so first read `figma-canon/references/figma-execute-atomicity.md` and the section "figma_execute timeout on bulk clone and font loads" in `figma-canon/references/plugin-api-anomalies.md`.
+`figma_execute` has a default timeout of 5000 ms and accepts up to 30000 ms. After a timeout or an error, do not rerun at once: this recipe removes the prior overlay and then draws a new one, so first read [`figma-canon/references/figma-execute-atomicity.md`](../figma-canon/references/figma-execute-atomicity.md) and the section "figma_execute timeout on bulk clone and font loads" in [`figma-canon/references/plugin-api-anomalies.md`](../figma-canon/references/plugin-api-anomalies.md).
 
 ### Phase 4: Validate
 
-Use `figma_capture_screenshot` (plugin export). REST-backed screenshots return HTTP 429 (rate limited) after a handful of calls in a batch; see `figma-canon/references/rate-limit-recovery.md`. **Do not** use `figma_take_screenshot` for large sections.
+Use `figma_capture_screenshot` (plugin export). REST-backed screenshots return HTTP 429 (rate limited) after a handful of calls in a batch; see [`figma-canon/references/rate-limit-recovery.md`](../figma-canon/references/rate-limit-recovery.md). **Do not** use `figma_take_screenshot` for large sections.
 
 As of figma-console-mcp v1.40.8, `figma_take_screenshot` uses the Desktop Bridge plugin when connected and falls back to the REST API, while `figma_capture_screenshot` always uses the plugin runtime and needs the bridge. The rule above still holds: `figma_capture_screenshot` is the call that always stays on the plugin runtime.
 
@@ -187,4 +194,4 @@ if (overlay) overlay.remove();
 - `figma-canon` + `figma-preflight`: required before any `figma_execute` write.
 - `figma-orient`: only run if file is unfamiliar this session; skip otherwise.
 - `references/draw-overlay.js`: full hardened snippet, copy + parameterize for use. It is a `figma_execute` body (top-level `await` and `return`), not a standalone Node script.
-- `figma-canon/references/figma-execute-atomicity.md`: what to do after a `figma_execute` timeout or error before retrying.
+- [`figma-canon/references/figma-execute-atomicity.md`](../figma-canon/references/figma-execute-atomicity.md): what to do after a `figma_execute` timeout or error before retrying.

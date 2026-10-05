@@ -9,9 +9,14 @@ description: >-
   list by node id. Use when the user asks "is this ready?", "final review", "audit this screen",
   "ship it", "tá pronto?", "pode fechar", "audita".
 license: MIT
+compatibility: >-
+  Read-only. Detectors are written for figma-console-mcp tools (figma_execute,
+  figma_get_variables, figma_capture_screenshot) with the Desktop Bridge plugin running in Figma
+  Desktop. The official Figma MCP server's use_figma also runs Plugin API JavaScript, but this
+  skill was not validated there. Reads the figma-canon skill.
 metadata:
   author: Thiago Xikota
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # figma-slop-check
@@ -54,11 +59,11 @@ Why the gate exists: without it, a handoff ships with one capitalization on one 
 
 | Reference | What this gate takes from it |
 | --- | --- |
-| `figma-canon/references/ai-slop-signatures.md` | The catalog of slop patterns and the severity table. This skill points at it and does not repeat it. |
-| `figma-canon/references/quality-rubric.md` | The 5 auto-fail criteria and the 0-10 score (8/10 minimum). |
-| `figma-canon/references/naming-canon.md` | Naming rules, the banned list and the Human authorship section. |
-| `figma-canon/references/state-coverage.md` | Required states per screen class. |
-| `figma-canon/references/handoff-format.md` | Handoff-specific slop (amber captions, FILL-in-HUG overflow, `@user_NNN` placeholders), plus the spacing and caption canon that detectors 12 and 13 cite. |
+| [`figma-canon/references/ai-slop-signatures.md`](../figma-canon/references/ai-slop-signatures.md) | The catalog of slop patterns and the severity table. This skill points at it and does not repeat it. |
+| [`figma-canon/references/quality-rubric.md`](../figma-canon/references/quality-rubric.md) | The 5 auto-fail criteria and the 0-10 score (8/10 minimum). |
+| [`figma-canon/references/naming-canon.md`](../figma-canon/references/naming-canon.md) | Naming rules, the banned list and the Human authorship section. |
+| [`figma-canon/references/state-coverage.md`](../figma-canon/references/state-coverage.md) | Required states per screen class. |
+| [`figma-canon/references/handoff-format.md`](../figma-canon/references/handoff-format.md) | Handoff-specific slop (amber captions, FILL-in-HUG overflow, `@user_NNN` placeholders), plus the spacing and caption canon that detectors 12 and 13 cite. |
 | `references/detectors.md` | The 15 rigor detectors in full, plus what data to collect in one read-only pass before running them. |
 | `references/severity-and-exceptions.md` | Severity, finding classes, delta, accepted drift, exception ledger, expected false positives, how to cite the canon. |
 
@@ -76,7 +81,7 @@ Run the checks that apply to what was made: design (S1 to S6), copy (S7), reply 
 - The internal padding of a card is at least 16px.
 - The section background is distinct from the frame background.
 
-Detect: take a screenshot of the whole section at scale 0.4 and review it. Measure the gaps with detector 12. In a handoff section built with right-side annotations, the stricter spacing constants of `figma-canon/references/handoff-format.md` apply.
+Detect: take a screenshot of the whole section at scale 0.4 and review it. Measure the gaps with detector 12. In a handoff section built with right-side annotations, the stricter spacing constants of [`figma-canon/references/handoff-format.md`](../figma-canon/references/handoff-format.md) apply.
 
 ### S2. Information density (AI-stuffed cards)
 
@@ -107,7 +112,7 @@ The existing convention of the file is NOT an alibi. The sibling pattern may be 
 
 When options need comparing on the canvas, each option gets its own box, with pros on `+` lines and cons on lines that open with the minus sign U+2212 (never an em dash). The recommended option gets a visible marker and one final "because ..." line. A format that reads well: a white card with a border stroke per option, a bold green `+`, a bold red minus sign, and on the recommended one a 1.5 accent stroke, an accent pill and the "because ..." line in SemiBold. Label the recommendation in plain first-person words, with a qualifier when it is conditional, never an ALL-CAPS "RECOMMENDED". No caps headers, no governance numbering.
 
-Detect: scan the top-level names of the page for emoji, codenames and dates. The expected count is zero. Before creating a section or a note, ask: would a designer in a hurry write this? Full rule: the Human authorship section of `figma-canon/references/naming-canon.md`.
+Detect: scan the top-level names of the page for emoji, codenames and dates. The expected count is zero. Before creating a section or a note, ask: would a designer in a hurry write this? Full rule: the Human authorship section of [`figma-canon/references/naming-canon.md`](../figma-canon/references/naming-canon.md).
 
 ### S5. Visual cocktail and decorative excess
 
@@ -128,7 +133,7 @@ Detect: scan the top-level names of the page for emoji, codenames and dates. The
 - **SaaS boilerplate leads:** "Manage your X", "Get started in seconds", "Welcome to...", "Whether you're a...", "Designed to help you...", "Connect with friends and...".
 - **Friendly emoji in error or empty states:** "Oops! Something went wrong..." followed by a nervous smile fails. "It did not work. Try again." passes.
 - **A long sentence that says nothing:** if a sentence can be cut in half without losing meaning, cut it.
-- **Sample data:** no realistic creator-style handle (a first name plus a vibe word, or a first name plus an initial). Two rules conflict on the replacement: the field slop rule offers neutral i18n handles such as `@user_001`, while `figma-canon/references/handoff-format.md` bans `@user_NNN` placeholders and asks for realistic names in the file's language. The project map decides; if it is silent, ask the designer.
+- **Sample data:** no realistic creator-style handle (a first name plus a vibe word, or a first name plus an initial). Two rules conflict on the replacement: the field slop rule offers neutral i18n handles such as `@user_001`, while [`figma-canon/references/handoff-format.md`](../figma-canon/references/handoff-format.md) bans `@user_NNN` placeholders and asks for realistic names in the file's language. The project map decides; if it is silent, ask the designer.
 - **Locale:** currency and number format follow the locale of the screen (symbol, decimal separator). No hardcoded `$` that assumes USD.
 - **Project terms:** compare against the project's glossary and voice guide, if it has them (detector 4).
 
@@ -157,7 +162,7 @@ Detect: dump the `characters` of every TEXT node and search for the lists above.
 | 5 | Icon size drift | Icon outside the icon scale, one icon in two sizes, emoji used as an icon | List `icon-*` and `Icon/` nodes with their size |
 | 6 | Frame size and structure | Same-family screens with different widths, a fixed height that should hug, hug where it should fill, section background equal to frame background | Extract size, `layoutMode` and sizing modes |
 | 7 | Layer naming | Figma default names, component without `/`, root frame without `NN-name`, human text glued into a kebab name | List names recursively |
-| 8 | Instance versus detached copy | A layer named like a component that is not an instance, a detached instance | `isInstance`, `mainComponentId`, `isDetachedFromComponent` |
+| 8 | Instance versus detached copy | A layer named like a component that is not an instance, a frame detached from a component, an instance whose main component is gone | `isInstance`, `mainComponentId`, `isDetachedFromComponent`, `detachedInfo` on frames |
 | 9 | Variant property mismatch | Unknown property, value outside the enum, required property not set | `componentProperties` versus the main component |
 | 10 | Typography drift | One text role with two weights or sizes, text with no text style, mixed font families | `fontName`, `fontSize`, `fontWeight`, `lineHeight`, `textStyleId` |
 | 11 | Glass only over content | Glass over a full-screen opaque fill, glass on glass, glass fill opacity above 0.85 | `effects[].type === "GLASS"` plus the parent chain |
@@ -168,10 +173,10 @@ Detect: dump the `characters` of every TEXT node and search for the lists above.
 
 ### Catalog checks (apply them as the canon writes them)
 
-- **Auto-fails:** the 5 criteria of `figma-canon/references/quality-rubric.md` (hardcoded colors, missing auto layout, default Figma names, detached components, layer overlap). Any one of them means that section is redone, not declared done. In the punch list each keeps the severity of the catalog's Severity scoring table (default names are Critical; hardcoded hex, missing auto layout and detached instances are High), and any one of them blocks a PASS.
+- **Auto-fails:** the 5 criteria of [`figma-canon/references/quality-rubric.md`](../figma-canon/references/quality-rubric.md) (hardcoded colors, missing auto layout, default Figma names, detached components, layer overlap). Any one of them means that section is redone, not declared done. In the punch list each keeps the severity of the catalog's Severity scoring table (default names are Critical; hardcoded hex, missing auto layout and detached instances are High), and any one of them blocks a PASS.
 - **Reuse, tokens and layout:** apply "Component reuse failures", "Token violations", "Layout & positioning" and "Card and state anti-patterns" from the catalog: a new `Button` drawn while `Button/Primary` exists, an icon recreated as vectors, inline effect styles while elevation tokens exist, a hardcoded font size or spacing, a top-level node at (0,0) colliding with content, `resize()` called after the sizing modes. Take the severity from the catalog's table; where it has no row, the catalog only says "flag": place it with the ladder in `references/severity-and-exceptions.md`.
 - **Contrast and targets:** "WCAG auto-fails" in the catalog (text and UI contrast, text size, color-only state, focus indicators). When judging contrast, compose the opacity chain of the node and of its groups (the opacity chain rule in the Hard rules of the `figma-canon` skill).
-- **State coverage:** a screen with only the happy path loses a point in dimension D of the rubric. Check the required states for its screen class in `figma-canon/references/state-coverage.md`.
+- **State coverage:** a screen with only the happy path loses a point in dimension D of the rubric. Check the required states for its screen class in [`figma-canon/references/state-coverage.md`](../figma-canon/references/state-coverage.md).
 - **Score:** rate the frame with the rubric. Below 8/10, fix before declaring done. Cite the score in the report.
 
 ## Workflow
@@ -266,7 +271,7 @@ Every finding carries a severity (how much it hurts) and a class (what to do): *
 ## On failure
 
 - **A failed slop check on work you just made:** fix it before you answer. Never pass it forward as "I will fix it later". Then re-run the check.
-- **Rigor findings:** read-only until the user approves. The user answers "fix 2", "fix all high", "apply 1, 3, 5", and you apply ONLY the approved items. Never apply a batch without approval. Each fix gets a validation screenshot (`figma_take_screenshot` of the section afterwards). As of figma-console-mcp v1.40.8, `figma_take_screenshot` falls back to the REST API when the Bridge is not connected, and REST can render stale state after plugin edits (`figma-canon/references/plugin-api-anomalies.md`); `figma_capture_screenshot` always uses the plugin runtime, so prefer it for this proof. Every fix is a write: it goes through `figma-preflight` like any other.
+- **Rigor findings:** read-only until the user approves. The user answers "fix 2", "fix all high", "apply 1, 3, 5", and you apply ONLY the approved items. Never apply a batch without approval. Each fix gets a validation screenshot (`figma_take_screenshot` of the section afterwards). As of figma-console-mcp v1.40.8, `figma_take_screenshot` falls back to the REST API when the Bridge is not connected, and REST can render stale state after plugin edits ([`figma-canon/references/plugin-api-anomalies.md`](../figma-canon/references/plugin-api-anomalies.md)); `figma_capture_screenshot` always uses the plugin runtime, so prefer it for this proof. Every fix is a write: it goes through `figma-preflight` like any other.
 - **By class:** an approved **exact** is applied and nothing is recorded. An approved **approximation** is applied AND appended to the accepted drift file with its delta, node id and date (applying without recording the delta is how the debt disappears). A **new decision** never enters "all": with no answer from the designer, apply nothing and keep the finding open for the next run.
 - **The user accepts a finding as intentional:** record it in the exception ledger, with a reason and a scope (`references/severity-and-exceptions.md`).
 - **"skip" or "leave it as it is":** stop. Do not force the fix.
