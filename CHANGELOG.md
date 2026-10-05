@@ -8,6 +8,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- `figma-comment-fix-loop/scripts/fetch_comments.py`: reads the open comments through the REST API with the token from the environment, sends it only to api.figma.com and never prints it. The skill calls it instead of an inline `curl`.
+- `.codexignore`, and the square icon in the Codex and Cursor listings.
 - Manifests for more agents, all at 1.1.0 with one shared description: a root `plugin.json` (Agent Plugins 1.0.0), `.codex-plugin/plugin.json` for Codex, `.cursor-plugin/plugin.json` for Cursor, `gemini-extension.json` for Gemini CLI and `skills.sh.json` for the skills.sh page groupings. The Codex, Copilot CLI and Gemini CLI installs were run from a local copy; Cursor was not tested.
 - `docs/gotchas.md` ("Why does my agent...?"): every gotcha indexed by the symptom a designer sees, plus an index by literal error message. It links to the notes and never restates a fix.
 - `docs/landscape.md`: a dated map of the Figma MCP servers, skill sets and catalogs, and how these skills compose with Figma's own.

@@ -17,5 +17,6 @@
     "design-qa",
     "claude-code",
     "agent-skills"
-  ]
+  ],
+  "logo": "assets/icon.png"
 }

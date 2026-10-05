@@ -142,7 +142,7 @@ Skill por skill: [works-with.md](works-with.md).
 
 O `npx skills add thiagoxikota/figma-maxxing` funciona com a maioria dos agentes. A CLI `skills` é de terceiros e envia contagem anônima de instalação; `DISABLE_TELEMETRY=1` desliga.
 
-Todas as rotas abaixo, menos a da pasta de plugin do Cursor, rodaram em 05/10/2026 a partir de uma cópia local desta versão, numa pasta de teste limpa, e cada uma instalou as 8 skills. Rodei tudo antes de publicar esta versão, então instalei a partir de uma pasta local, não pelos endereços do GitHub que aparecem aqui.
+Todas as rotas abaixo, menos a do Cursor, rodaram em 05/10/2026 a partir do GitHub, exatamente como estão escritas aqui, numa pasta de teste limpa, e cada uma instalou as 8 skills desta versão.
 
 <details>
 <summary><b>Claude Code</b></summary>
@@ -184,10 +184,10 @@ Rodou com o Copilot CLI 1.0.61.
 <summary><b>Gemini CLI</b></summary>
 
 ```bash
-gemini extensions install https://github.com/thiagoxikota/figma-maxxing
+gemini extensions install https://github.com/thiagoxikota/figma-maxxing --ref main
 ```
 
-Rodou a partir de uma pasta local com o Gemini CLI 0.43.0, que pede para você confiar na pasta antes.
+Rodou com o Gemini CLI 0.43.0. Ele pede para você confiar na pasta e confirmar a instalação; o `--consent` responde as duas perguntas, e foi assim que o teste rodou. O `--ref main` é necessário porque o Gemini instala primeiro a última release do GitHub, e a release v1.0.0 não tem o manifest do Gemini.
 
 </details>
 
@@ -321,7 +321,7 @@ gh attestation verify figma-preflight-1.1.0.zip \
 
 Fora deste repositório, o [M8ven Trust Index](https://m8ven.ai/mcp/thiagoxikota/figma-maxxing) avalia o projeto de forma independente. Lá, um projeto novo fica limitado à nota C até ganhar adoção; o código em si tirou 100 de 100 em 05/10/2026.
 
-[![M8ven Trust Index](https://m8ven.ai/badge/mcp/thiagoxikota/figma-maxxing)](https://m8ven.ai/mcp/thiagoxikota/figma-maxxing)
+[![M8ven Score](https://m8ven.ai/badge/mcp/thiagoxikota/figma-maxxing)](https://m8ven.ai/mcp/thiagoxikota/figma-maxxing?s=readme)
 
 ## Até onde foi testado
 
@@ -329,7 +329,7 @@ Em 05/10/2026:
 
 - **Meu trabalho.** Construí estas skills no Claude Code, no macOS, com o figma-console-mcp, em arquivos reais. Esta edição pública é uma reescrita daquele conjunto: em inglês, generalizada e sem nenhum detalhe de cliente. Ainda não rodou de ponta a ponta numa segunda máquina.
 - **MCP oficial da Figma.** O teste às cegas lá de cima, numa tela de demonstração. A auditoria usou 12 chamadas ao MCP da Figma, a correção usou 13 e a segunda auditoria, mais 13. Alguns passos não tinham ferramenta lá ou esbarraram em limite: não há seleção, o `get_screenshot` não captura acima de 1x, não há status da bridge e cada chamada tem limite de 20 KB. Os agentes contornaram esses limites usando o `use_figma` só para ler, sem editar nada, e registraram cada contorno no [works-with.md](works-with.md#blind-demo-on-the-official-figma-mcp).
-- **Instalações.** Todas as rotas de [Instalar no seu agente](#instalar-no-seu-agente), menos o Cursor, a partir de uma cópia local.
+- **Instalações.** Todas as rotas de [Instalar no seu agente](#instalar-no-seu-agente), menos o Cursor, a partir do GitHub.
 
 Se alguma coisa ainda depender do meu ambiente, [abra uma issue](https://github.com/thiagoxikota/figma-maxxing/issues) com o seu ambiente e o erro exato.
 

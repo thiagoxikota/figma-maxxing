@@ -35,6 +35,8 @@
       "Is this Figma frame ready for handoff?",
       "What is in this Figma file?"
     ],
-    "brandColor": "#DC000C"
+    "brandColor": "#DC000C",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/icon.png"
   }
 }

@@ -42,12 +42,13 @@ Comments come from people outside this session: stakeholders, clients, anyone wi
 
 The Plugin API cannot read comments. Comments are read through the REST API, or through `figma_get_comments`, with the personal access token in the `FIGMA_ACCESS_TOKEN` environment variable. The figma-console MCP server reads the same variable, but it takes its own copy from its MCP config, and that copy can be older than the one in your shell. Never print the token, never write it to a file, never ask for its value in the chat. If the variable is not set in the shell, ask the user to export it there.
 
-- `figma_get_comments` tends to return 403 when the token copy in the MCP server config is stale. Canonical path: call the REST endpoint directly, `GET https://api.figma.com/v1/files/<fileKey>/comments` with the `X-Figma-Token` header. Keep the raw JSON.
+- `figma_get_comments` tends to return 403 when the token copy in the MCP server config is stale. Canonical path: call the REST endpoint directly, `GET https://api.figma.com/v1/files/<fileKey>/comments` with the `X-Figma-Token` header, through the bundled script. It reads the token from the environment, sends it only to api.figma.com, never prints it, and keeps the raw JSON.
 
   ```bash
-  curl -sS -H "X-Figma-Token: $FIGMA_ACCESS_TOKEN" \
-    "https://api.figma.com/v1/files/<fileKey>/comments" -o comments-raw.json
+  python3 "${CLAUDE_SKILL_DIR}/scripts/fetch_comments.py" <fileKey> comments-raw.json
   ```
+
+  Other agents: the script sits in `scripts/` next to this file.
 
 - File that belongs to ANOTHER account: a personal access token and the OAuth session of the official Figma MCP server both return 404, and the Plugin API cannot read comments. The token has no access to the file. Ask the user to paste the comments: every open one, with its author, its text and the frame it is pinned on. Pasted comments carry no `client_meta`, so the frame and the pinned element come from the user.
 - The user pasted only ONE comment? It still triggers a FULL round: pull the whole open set before touching anything. One pasted comment is a symptom of a fresh review (field note, 2026-07: 1 pasted comment, 8 open ones from the same hour, including a sibling asking for the SAME color fix on another element). Fixing only the pasted one is guaranteed rework.
