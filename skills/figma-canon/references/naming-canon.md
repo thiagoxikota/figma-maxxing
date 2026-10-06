@@ -165,7 +165,7 @@ This overrides the structured conventions above wherever the surface is visible 
 - Single letters: `A`, `B`, `C` (not semantic)
 - Compound names without separator: `ButtonPrimaryDefault` (use slash hierarchy)
 
-The `figma-slop-check` skill auto-fails on the Figma default names above, and its naming detector also flags a component name with no `/`. It has no detector for color names or single letters: check those by reading the layer list.
+The `figma-slop-check` skill auto-fails on the Figma default names above, and its `names` check also flags a component name with no `/`. It has no check for color names or single letters: check those by reading the layer list.
 
 ## Audit-before-rename rule
 

@@ -4,6 +4,18 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-05
+
+### Changed
+
+- `figma-slop-check`: the Rigor lens is rewritten as 11 rigor checks in 5 groups, ordered by what a node stores: bound or loose (`color`, `text-style`, `scale`), components intact (`detached`, `properties`), auto layout sized right (`sizing`, `collapse`, `fill-in-hug`), words (`wording`, `names`) and pixels (`screenshot`). Spacing, radius and icon size are one `scale` check. Findings are tagged by check name, not by number. `references/detectors.md` becomes `references/checks.md`.
+- `figma-slop-check`: each finding is labeled swap, snap or ask (it was exact, approximation or new decision), with a signed distance on a snap. One `.figma-slop-check/decisions.json` replaces `exceptions.json` and `drift-accepted.json`: an `intentional` entry leaves the punch list, a `debt` entry comes back with its distance until it is fixed, and an applied snap is logged in the run file. An existing `exceptions.json` or `drift-accepted.json` is no longer read; move its entries by hand. `references/severity-and-exceptions.md` becomes `references/punch-list.md`.
+- Both READMEs and `docs/works-with.md` say that the blind test ran with the earlier rigor lens.
+
+### Removed
+
+- `figma-slop-check`: the glass-over-content detector and the frame-name label clearance detector (an 80px floor between stacked frames). The slop lens keeps one line for each: no glass stacked on glass or with nothing behind it, and no frame-name label landing on the frame above.
+
 ## [1.1.1] - 2026-10-05
 
 ### Security

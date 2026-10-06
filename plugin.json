@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "figma-maxxing",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Agent skills for real Figma files: Plugin API gotchas, checks before and after every write, comments to verified fixes, handoff gate.",
   "author": {
     "name": "Thiago Xikota"

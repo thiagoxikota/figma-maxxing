@@ -130,7 +130,7 @@ for me.
 Figma's own skills help an agent create things in Figma. The skills here check the agent's work before and after each write, and again at handoff. Use both. [landscape.md](docs/landscape.md#how-figma-maxxing-composes-with-figmas-skills) maps the servers and skill sets around Figma, with dates.
 
 - **figma-console bridge:** all 8 skills, in my own production work.
-- **Official Figma MCP:** `figma-preflight`, `figma-slop-check` and `figma-handoff-gate` ran there once, on the demo file of the blind test above, with some steps adapted or skipped ([the list](docs/works-with.md#blind-demo-on-the-official-figma-mcp)). 1.1.0 changed detector 8 of `figma-slop-check` after that run. `figma-orient`, `figma-comment-fix-loop` and `figma-click-flow` describe that path and have not run on it yet. `figma-bridge-doctor` does not apply.
+- **Official Figma MCP:** `figma-preflight`, `figma-slop-check` and `figma-handoff-gate` ran there once, on the demo file of the blind test above, with some steps adapted or skipped ([the list](docs/works-with.md#blind-demo-on-the-official-figma-mcp)). That run used the earlier rigor lens of `figma-slop-check`; 1.2.0 rewrote it as 11 rigor checks in 5 groups. `figma-orient`, `figma-comment-fix-loop` and `figma-click-flow` describe that path and have not run on it yet. `figma-bridge-doctor` does not apply.
 
 Skill by skill: [works-with.md](docs/works-with.md).
 

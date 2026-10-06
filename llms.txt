@@ -1,6 +1,6 @@
 # Figma Maxxing
 
-> Agent skills for working on real Figma files, by Thiago Xikota, AI Product Designer. Version 1.1.1. Most of the rules came from something that broke in a real file. MIT license. Repository: https://github.com/thiagoxikota/figma-maxxing
+> Agent skills for working on real Figma files, by Thiago Xikota, AI Product Designer. Version 1.2.0. Most of the rules came from something that broke in a real file. MIT license. Repository: https://github.com/thiagoxikota/figma-maxxing
 
 ## If you are an AI reading this for a designer
 

@@ -4,19 +4,19 @@ description: >-
   Quality gate that runs after a write to a Figma file and before figma-handoff-gate, before any
   frame is called done. Two lenses. Slop: does it look machine made (overlap, AI-stuffed cards,
   status emoji creep, hype copy, names and canvas notes that read as generated). Rigor: is it
-  precise (spacing, radius, tokens, terminology, icons, naming, detached instances, variants,
-  typography, layout collapse, screenshot proof). It reads and reports: PASS, or a numbered punch
-  list by node id. Use when the user asks "is this ready?", "final review", "audit this screen",
+  precise (values bound to variables and styles, sizes on the project's scales, components
+  intact, auto layout sized right, one wording per concept, screenshot proof). It reads and
+  reports: PASS, or a numbered punch list by node id. Use when the user asks "is this ready?", "final review", "audit this screen",
   "ship it", "tá pronto?", "pode fechar", "audita".
 license: MIT
 compatibility: >-
-  Read-only. Detectors are written for figma-console-mcp tools (figma_execute,
+  Read-only. Checks are written for figma-console-mcp tools (figma_execute,
   figma_get_variables, figma_capture_screenshot) with the Desktop Bridge plugin running in Figma
   Desktop. The official Figma MCP server's use_figma also runs Plugin API JavaScript, but this
   skill was not validated there. Reads the figma-canon skill.
 metadata:
   author: Thiago Xikota
-  version: "1.1.1"
+  version: "1.2.0"
 ---
 
 # figma-slop-check
@@ -63,9 +63,9 @@ Why the gate exists: without it, a handoff ships with one capitalization on one 
 | [`figma-canon/references/quality-rubric.md`](../figma-canon/references/quality-rubric.md) | The 5 auto-fail criteria and the 0-10 score (8/10 minimum). |
 | [`figma-canon/references/naming-canon.md`](../figma-canon/references/naming-canon.md) | Naming rules, the banned list and the Human authorship section. |
 | [`figma-canon/references/state-coverage.md`](../figma-canon/references/state-coverage.md) | Required states per screen class. |
-| [`figma-canon/references/handoff-format.md`](../figma-canon/references/handoff-format.md) | Handoff-specific slop (amber captions, FILL-in-HUG overflow, `@user_NNN` placeholders), plus the spacing and caption canon that detectors 12 and 13 cite. |
-| `references/detectors.md` | The 15 rigor detectors in full, plus what data to collect in one read-only pass before running them. |
-| `references/severity-and-exceptions.md` | Severity, finding classes, delta, accepted drift, exception ledger, expected false positives, how to cite the canon. |
+| [`figma-canon/references/handoff-format.md`](../figma-canon/references/handoff-format.md) | Handoff-specific slop (amber captions, FILL-in-HUG overflow, `@user_NNN` placeholders), plus the handoff spacing and caption canon. |
+| `references/checks.md` | The 11 rigor checks, plus the one read-only pass that feeds them. |
+| `references/punch-list.md` | Severity, the swap, snap and ask actions, where expected values come from, what to leave out, and the decisions file. |
 
 Also read the project map (`figma-map.md`, default `docs/figma-map.md`) for the project's scales, glossary and conventions. Project canon overrides the universal one.
 
@@ -76,12 +76,12 @@ Run the checks that apply to what was made: design (S1 to S6), copy (S7), reply 
 ### S1. Overlap and spacing integrity
 
 - No frame, card or element overlaps another.
-- The gap between rows is at least 100px (detector 12 makes a gap under 80px between frames stacked in y a high finding).
-- A caption or annotation beside a frame sits at least 32px from it. A caption stacked below a free-positioned frame falls under detector 12 (80px floor, 100 recommended), because its frame name renders above it.
+- Free-positioned frames stacked in a column leave room for the frame-name label that Figma draws above each frame: no label lands on the frame above it.
+- A caption or annotation beside a frame sits at least 32px from it.
 - The internal padding of a card is at least 16px.
 - The section background is distinct from the frame background.
 
-Detect: take a screenshot of the whole section at scale 0.4 and review it. Measure the gaps with detector 12. In a handoff section built with right-side annotations, the stricter spacing constants of [`figma-canon/references/handoff-format.md`](../figma-canon/references/handoff-format.md) apply.
+Detect: take a screenshot of the whole section at scale 0.4 and review it. In a handoff section built with right-side annotations, the stricter spacing constants of [`figma-canon/references/handoff-format.md`](../figma-canon/references/handoff-format.md) apply.
 
 ### S2. Information density (AI-stuffed cards)
 
@@ -118,7 +118,7 @@ Detect: scan the top-level names of the page for emoji, codenames and dates. The
 
 - Apply "Visual cocktail signature" and "Decorative excess" from the catalog.
 - Type hierarchy comes from weight and size, not from a loud color.
-- No glass on glass without separation (detector 11 has the full rule).
+- No glass stacked on glass without separation, and no glass with nothing behind it to refract.
 - When the project map or agent instructions declare a visual direction, a frame that breaks it fails here. Examples for an iOS-native direction: no flat drop shadow as the primary depth cue, no neon gradients.
 - Before flagging a card as slop, apply the Sibling-check rule of the catalog: inspect at least 2 siblings of the same class first.
 
@@ -135,7 +135,7 @@ Detect: scan the top-level names of the page for emoji, codenames and dates. The
 - **A long sentence that says nothing:** if a sentence can be cut in half without losing meaning, cut it.
 - **Sample data:** no realistic creator-style handle (a first name plus a vibe word, or a first name plus an initial). Two rules conflict on the replacement: the field slop rule offers neutral i18n handles such as `@user_001`, while [`figma-canon/references/handoff-format.md`](../figma-canon/references/handoff-format.md) bans `@user_NNN` placeholders and asks for realistic names in the file's language. The project map decides; if it is silent, ask the designer.
 - **Locale:** currency and number format follow the locale of the screen (symbol, decimal separator). No hardcoded `$` that assumes USD.
-- **Project terms:** compare against the project's glossary and voice guide, if it has them (detector 4).
+- **Project terms:** compare against the project's glossary and voice guide, if it has them (the `wording` check).
 
 Detect: dump the `characters` of every TEXT node and search for the lists above. Then read the copy aloud: if it sounds like a SaaS demo, it is slop.
 
@@ -151,30 +151,26 @@ Detect: dump the `characters` of every TEXT node and search for the lists above.
 
 ## Lens 2: Rigor (is it precise)
 
-15 detectors. Each one has a capture method, a failure rule and a cross-reference procedure in `references/detectors.md`. Do not run them from memory: collect the data through the figma-console MCP server and compare.
+11 rigor checks in 5 groups, ordered by what a node stores. `references/checks.md` says what each one reads and when it fails. Run them on data you collected through the figma-console MCP server, not from memory.
 
-| # | Detector | Fails when (short form) | How to detect |
-| --- | --- | --- | --- |
-| 1 | Spacing precision | Padding or gap outside the project's scale, off-by-1 asymmetry, sibling rows with different padding, one odd gap in a list | Extract padding and `itemSpacing`, compare siblings |
-| 2 | Radius drift | Radius outside the scale, decimal radius (`18.5`), one surface class with two radii | Extract `cornerRadius` and the per-corner radii |
-| 3 | Token compliance | Raw hex where a variable exists, a color that matches no token, an unbound stroke, a hallucinated token name | `boundVariables` on fills and strokes versus `figma_get_variables` |
-| 4 | Terminology drift | A glossary term broken, or one label written two ways across screens (plural, case, tense, punctuation) | Dump `characters` grouped by screen |
-| 5 | Icon size drift | Icon outside the icon scale, one icon in two sizes, emoji used as an icon | List `icon-*` and `Icon/` nodes with their size |
-| 6 | Frame size and structure | Same-family screens with different widths, a fixed height that should hug, hug where it should fill, section background equal to frame background | Extract size, `layoutMode` and sizing modes |
-| 7 | Layer naming | Figma default names, component without `/`, root frame without `NN-name`, human text glued into a kebab name | List names recursively |
-| 8 | Instance versus detached copy | A layer named like a component that is not an instance, a frame detached from a component, an instance whose main component is gone | `isInstance`, `mainComponentId`, `isDetachedFromComponent`, `detachedInfo` on frames |
-| 9 | Variant property mismatch | Unknown property, value outside the enum, required property not set | `componentProperties` versus the main component |
-| 10 | Typography drift | One text role with two weights or sizes, text with no text style, mixed font families | `fontName`, `fontSize`, `fontWeight`, `lineHeight`, `textStyleId` |
-| 11 | Glass only over content | Glass over a full-screen opaque fill, glass on glass, glass fill opacity above 0.85 | `effects[].type === "GLASS"` plus the parent chain |
-| 12 | Frame-name label clearance | Two free-positioned frames stacked with a gap under 80px (100 recommended) | `next.y - (prev.y + prev.height)` over the sorted children |
-| 13 | Caption FILL-in-HUG | TEXT set to FILL inside a HORIZONTAL HUG stack, ABSOLUTE text inside auto layout | Sizing modes inside caption frames (`caption · *`, or the project's caption naming) |
-| 14 | Layout collapse | A container child narrower than 70% of its VERTICAL parent, width=1 or height=0 | `child.width / parent.width` |
-| 15 | Visual screenshot verification | A screenshot shows overlap, collapse, label on label or a bad crop. Skipping this step is itself a critical failure | `figma_capture_screenshot` on 3 to 5 representative frames |
+| Group | Check | Fails when (short form) |
+| --- | --- | --- |
+| Bound or loose | `color` | A raw hex where the variable exists, a color with no variable, an invented variable or style name |
+| | `text-style` | Text with no style where one fits, one role at two sizes or weights, a foreign font family |
+| | `scale` | A padding, gap, radius or icon size off the project's scale, a decimal, siblings that disagree, an emoji as an icon |
+| Components intact | `detached` | A frame detached from a component, a component-named layer that is not an instance, an instance with no main component |
+| | `properties` | A variant value outside its options, an unknown property, a needed property unset |
+| Auto layout sized right | `sizing` | Same-family screens at different widths, fixed where it should hug, hug where it should fill |
+| | `collapse` | A content child under 70% of its vertical parent's width, a node 1px wide or 0px tall |
+| | `fill-in-hug` | Text set to fill inside a horizontal frame that hugs, absolute text inside auto layout |
+| Words | `wording` | A glossary term broken, one concept written two ways across screens |
+| | `names` | Default Figma names, a component name without `/`, a root frame without `NN-name` |
+| Pixels | `screenshot` | A capture shows overlap, collapse or a bad crop. Skipping the captures is itself critical |
 
 ### Catalog checks (apply them as the canon writes them)
 
 - **Auto-fails:** the 5 criteria of [`figma-canon/references/quality-rubric.md`](../figma-canon/references/quality-rubric.md) (hardcoded colors, missing auto layout, default Figma names, detached components, layer overlap). Any one of them means that section is redone, not declared done. In the punch list each keeps the severity of the catalog's Severity scoring table (default names are Critical; hardcoded hex, missing auto layout and detached instances are High), and any one of them blocks a PASS.
-- **Reuse, tokens and layout:** apply "Component reuse failures", "Token violations", "Layout & positioning" and "Card and state anti-patterns" from the catalog: a new `Button` drawn while `Button/Primary` exists, an icon recreated as vectors, inline effect styles while elevation tokens exist, a hardcoded font size or spacing, a top-level node at (0,0) colliding with content, `resize()` called after the sizing modes. Take the severity from the catalog's table; where it has no row, the catalog only says "flag": place it with the ladder in `references/severity-and-exceptions.md`.
+- **Reuse, tokens and layout:** apply "Component reuse failures", "Token violations", "Layout & positioning" and "Card and state anti-patterns" from the catalog: a new `Button` drawn while `Button/Primary` exists, an icon recreated as vectors, inline effect styles while elevation tokens exist, a hardcoded font size or spacing, a top-level node at (0,0) colliding with content, `resize()` called after the sizing modes. Take the severity from the catalog's table; where it has no row, the catalog only says "flag": place it with the severity table in `references/punch-list.md`.
 - **Contrast and targets:** "WCAG auto-fails" in the catalog (text and UI contrast, text size, color-only state, focus indicators). When judging contrast, compose the opacity chain of the node and of its groups (the opacity chain rule in the Hard rules of the `figma-canon` skill).
 - **State coverage:** a screen with only the happy path loses a point in dimension D of the rubric. Check the required states for its screen class in [`figma-canon/references/state-coverage.md`](../figma-canon/references/state-coverage.md).
 - **Score:** rate the frame with the rubric. Below 8/10, fix before declaring done. Cite the score in the report.
@@ -182,17 +178,17 @@ Detect: dump the `characters` of every TEXT node and search for the lists above.
 ## Workflow
 
 1. **Define the scope.** One screen, a set of sibling screens, or a whole section? Ask for the node id or the URL if it is not obvious. If the session has just written something, use the last selection: the node ids that write returned. Otherwise read the live selection with `figma_get_selection` and confirm the target with the user.
-   - 1 screen: detectors 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 14, 15. Skip the cross-screen part of 4, but still run its glossary lock.
-   - 2 to N sibling screens: every detector, with the cross-check active.
-   - A whole section: every detector, plus a summary table per screen.
+   - 1 screen: every check, with `wording` limited to its glossary half.
+   - 2 to N sibling screens: every check, with the cross-screen comparisons on.
+   - A whole section: every check, plus a summary table per screen.
 2. **Refresh state.** Call `figma_search_components` (node ids are session specific and may be stale). If the Bridge is disconnected, run the `figma-bridge-doctor` skill and stop. If the file changed since the last session, run `figma-orient` first.
 3. **Run the Slop lens** on what applies: design, copy, reply.
-4. **Collect read-only data** with a short `figma_execute` read of your own, one screen per call. What to collect, and how to bring it back, is in "Collecting the data" in `references/detectors.md`.
-5. **Run the Rigor detectors** over the collected data, in order, then the catalog checks.
+4. **Collect read-only data** with a short `figma_execute` read of your own, one screen per call. What to collect, and how to bring it back, is in "Read once, then judge" in `references/checks.md`.
+5. **Run the Rigor checks** over the collected data, group by group, then the catalog checks.
 6. **Prove it by screenshot, at the right scale:**
    - the whole section at scale 0.4, to see overlap and spacing (S1)
-   - 3 to 5 representative frames, one per category: a form, a list, a dashboard, a multi-section screen, the dark outlier if there is one (detector 15)
-   - every element that was fixed, captured individually and not as a sample (detector 13)
+   - 3 to 5 representative frames, one per category: a form, a list, a dashboard, a multi-section screen, the dark outlier if there is one (the `screenshot` check)
+   - every element that was fixed, captured on its own rather than as part of a sample
    - an overview is not proof of a fix at component level: the crop-scale rule (at least 1.2x) in the Hard rules of the `figma-canon` skill sets the scale for that crop
 7. **Emit the output** (next section), ordered by severity, highest first.
 8. **Pass again when asked.** A request such as "fix all" or "did you verify everything?" makes multiple passes mandatory: show the verification (grep plus a zero-residual report) and never claim done on a single pass (see "Multi-pass verification flag" in the catalog). Do this audit as a close read by a single agent, not as a parallel fan-out (see "Subagent fan-out caveat" in the catalog).
@@ -218,7 +214,7 @@ This log is an internal gate. Do not paste it into the reply to the user.
 ### PASS
 
 ```text
-PASS figma-slop-check: <N> detectors run, 0 findings. The screen agrees with itself and with the canon.
+PASS figma-slop-check: <N> checks run, 0 findings. The screen agrees with itself and with the canon.
 
 - Target: <node-id> (<screen name>)
 - Rubric: <score>/10
@@ -226,54 +222,54 @@ PASS figma-slop-check: <N> detectors run, 0 findings. The screen agrees with its
 - Next gate: figma-handoff-gate
 ```
 
-`<N>` is the number of detectors that step 1 selected. Never hardcode it in the text. After a PASS, run the `figma-handoff-gate` skill as the next lens before declaring the work done.
+`<N>` is the number of checks that step 1 selected. Never hardcode it in the text. After a PASS, run the `figma-handoff-gate` skill as the next lens before declaring the work done.
 
 ### FAIL
 
 ```text
 FAIL figma-slop-check: punch list
 Target: <node-id or node-ids> · <screen names>
-Detectors: <N> run · <N> findings
+Checks: <N> run · <N> findings
 
 ----------------------------------
-1. [SPACING] list row padding mismatch
-   Where: 123:456 · row · Name (row 3 of 11)
-   Found: T12 R16 B14 L16
-   Canon: T12 R16 B12 L16 (every other row in the list)
-   Class: approximation · delta +2 (bottom)
-   Severity: medium
-
-2. [TOKEN] card raw hex
+1. [COLOR] card raw hex
    Where: 123:789 · card
    Found: fill #16181D raw
    Canon: variable color/surface/card -> #16181D
-   Class: exact · delta 0
-   Severity: high (the token exists, it should be bound)
+   Action: swap · distance 0
+   Severity: high (the variable exists, it should be bound)
 
-3. [GLASS] glass card over a full-screen opaque fill
-   Where: 124:101 · card · Onboarding
-   Found: glass effect over a 430x932 frame with a solid opaque fill
-   Canon: not covered. No surface token exists for glass with no content behind it
-   Class: new decision
-   Severity: high
-   Question for the designer: does it become a solid surface token, or does the canon gain a new token?
+2. [SCALE] list row padding mismatch
+   Where: 123:456 · row · Name (row 3 of 11)
+   Found: T12 R16 B14 L16
+   Canon: T12 R16 B12 L16 (every other row in the list)
+   Action: snap · distance +2 (bottom)
+   Severity: medium
+
+3. [SCALE] two card radii, no rule yet
+   Where: 124:101 · card · Plan; 124:230 · card · Billing
+   Found: r=12 on one, r=16 on the other
+   Canon: not covered. The radius scale has both steps and no rule for cards
+   Action: ask
+   Severity: medium
+   Question for the designer: which radius do cards use?
 
 ...
 ----------------------------------
 Summary: N findings · X high · Y medium · Z low
-Classes: A exact · B approximations (largest delta: +/-N) · C new decisions
-Apply fix? Say the number (or "all exact", "all high", "skip"). Read-only until approved.
-New decisions never enter "all": each one needs your answer.
+Actions: A swap · B snap (largest distance: +/-N) · C ask
+Apply fix? Say the number (or "all swaps", "all high", "skip"). Read-only until approved.
+Asks never enter "all": each one needs your answer.
 ```
 
-Every finding carries a severity (how much it hurts) and a class (what to do): **exact**, **approximation** with its signed delta, or **new decision**. Definitions, the delta rule and the footer lines for suppressed findings and variable modes are in `references/severity-and-exceptions.md` and `references/detectors.md`.
+Every finding carries a severity (how much it hurts) and an action (what happens to it): **swap**, **snap** with its signed distance, or **ask**. Definitions, the distance rule and the footer lines for left-out findings and variable modes are in `references/punch-list.md` and `references/checks.md`.
 
 ## On failure
 
 - **A failed slop check on work you just made:** fix it before you answer. Never pass it forward as "I will fix it later". Then re-run the check.
 - **Rigor findings:** read-only until the user approves. The user answers "fix 2", "fix all high", "apply 1, 3, 5", and you apply ONLY the approved items. Never apply a batch without approval. Each fix gets a validation screenshot (`figma_take_screenshot` of the section afterwards). As of figma-console-mcp v1.40.8, `figma_take_screenshot` falls back to the REST API when the Bridge is not connected, and REST can render stale state after plugin edits ([`figma-canon/references/plugin-api-anomalies.md`](../figma-canon/references/plugin-api-anomalies.md)); `figma_capture_screenshot` always uses the plugin runtime, so prefer it for this proof. Every fix is a write: it goes through `figma-preflight` like any other.
-- **By class:** an approved **exact** is applied and nothing is recorded. An approved **approximation** is applied AND appended to the accepted drift file with its delta, node id and date (applying without recording the delta is how the debt disappears). A **new decision** never enters "all": with no answer from the designer, apply nothing and keep the finding open for the next run.
-- **The user accepts a finding as intentional:** record it in the exception ledger, with a reason and a scope (`references/severity-and-exceptions.md`).
+- **By action:** an approved **swap** is applied and nothing is recorded. An approved **snap** is applied and its distance goes into the `fixes` list of the run file, so the change leaves a trail. An **ask** never enters "all": with no answer from the designer, apply nothing and keep it open for the next run.
+- **The user accepts a finding as intentional:** record it as `intentional` in `.figma-slop-check/decisions.json`, with a reason and a scope. "Later" on a finding records it as `debt`, and it comes back with its distance until it is fixed (`references/punch-list.md`).
 - **"skip" or "leave it as it is":** stop. Do not force the fix.
 
 Stop conditions:

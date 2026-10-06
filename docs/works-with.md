@@ -46,7 +46,7 @@ Which Figma connection each skill needs, and how far each combination has been t
 - No server: it needs a read path to map the file.
 
 **`figma-slop-check`**
-- Bridge: the detectors are written for `figma_execute`, `figma_get_variables` and `figma_capture_screenshot`.
+- Bridge: the checks are written for `figma_execute`, `figma_get_variables` and `figma_capture_screenshot`.
 - Official server: `use_figma` also runs Plugin API JavaScript, and the skill states it was not validated there. It ran once, in the [blind demo](#blind-demo-on-the-official-figma-mcp).
 - No server: the two lenses and the catalog can be applied by hand in Figma; that use has not been tested.
 
@@ -95,7 +95,7 @@ Run on 2026-10-05 by agents in Claude Code, connected to Figma's official server
 - The optional precheck hook targets `figma_execute`, so it did not run. The fix agent checked its scripts by hand for the patterns the hook blocks.
 - The files the skills save in a project folder (run JSON, exception ledger) were not written, because the demo file has no project folder.
 
-**What the run found in the skills themselves:** detector 8 of `figma-slop-check` caught the detached row through its name match. Its second rule, `isDetachedFromComponent` on INSTANCE nodes, cannot fire on a detached copy, because Figma turns a detached instance into a FRAME. The auditor read `detachedInfo` on the frame instead. Detector 8 now reads it too; that rule was added after the run and has not run since.
+**What the run found in the skills themselves:** the detached-copy rule of `figma-slop-check` (detector 8 then, the `detached` check since 1.2.0) caught the detached row through its name match. Its second rule, `isDetachedFromComponent` on INSTANCE nodes, cannot fire on a detached copy, because Figma turns a detached instance into a FRAME. The auditor read `detachedInfo` on the frame instead. The check now reads it too; that rule was added after the run and has not run since.
 
 **What it does not show:** the agent that planted the defects had read these skills, so the defects match what the checks cover. One screen, one demo file, one run. A hit rate on files nobody prepared is not measured.
 

@@ -15,7 +15,7 @@ compatibility: >-
   implemented there). Requires the figma-canon and figma-preflight skills.
 metadata:
   author: Thiago Xikota
-  version: "1.1.1"
+  version: "1.2.0"
 ---
 
 # figma-click-flow: Click-flow handoff overlay

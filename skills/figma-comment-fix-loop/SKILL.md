@@ -17,7 +17,7 @@ compatibility: >-
   figma-preflight, figma-orient and figma-bridge-doctor.
 metadata:
   author: Thiago Xikota
-  version: "1.1.1"
+  version: "1.2.0"
 ---
 
 # figma-comment-fix-loop
