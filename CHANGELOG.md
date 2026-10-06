@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+
+- Both READMEs: move installation navigation into the opening, qualify the audit instructions and keep the demo test limits beside each result. Remove requests for stars.
+- Social preview: paper background, red accent and larger text, with an unmodified crop of the real demo screenshot and an embedded licensed font.
+
 ## [1.2.0] - 2026-10-05
 
 ### Changed
