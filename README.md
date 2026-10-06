@@ -54,9 +54,9 @@ The markers point at the first 8 items of the `figma-slop-check` punch list, in 
 7. **ICON:** hand-drawn person icon instead of Icon/User
 8. **RADIUS:** summary card radius off the scale
 
-The test used a demo screen with 10 planted defects and an answer key. The agent that built it had read the skills. A second agent, who never saw the key, ran `figma-slop-check` and `figma-handoff-gate` through Figma's official MCP server. Its prompt told it what to inspect: bound variables, instances versus frames, spacing, radius, names and text bounds. A third agent compared the punch list with the key.
+The test used a demo screen with 10 planted defects and an answer key. The agent that built it had read the skills. A second agent, who never saw the key, ran `figma-slop-check` and `figma-handoff-gate` through Figma's official MCP server. Its prompt told it what to inspect: bound variables, instances versus frames, spacing, radius, names and text bounds. A third agent, the judge, compared the punch list with the key.
 
-**10 of 10 planted defects found, 0 partial, 0 missed.** The agent that planted the defects had read the skills, the auditor's prompt said where to look, and this was one screen in one run. The punch list had 27 items: 16 from `figma-slop-check` and 11 from `figma-handoff-gate`. Of those, 13 match a planted defect (some defects show up in more than one item). The other 14 items point at problems outside the key: 13 distinct ones, because both gates flagged the same rename. None contradicted the key or the screenshots, though 2 could not be checked without opening the file, and the judge did not open it. One is a contrast failure the answer key itself missed.
+**10 of 10 planted defects found, 0 partial, 0 missed.** The agent that planted the defects had read the skills, the auditor's prompt said where to look, and this was one screen in one run. The punch list had 27 items: 16 from `figma-slop-check` and 11 from `figma-handoff-gate`. Of those, 13 match a planted defect (some defects show up in more than one item). The other 14 items point at problems outside the key: 13 distinct ones, because both gates flagged the same rename. None contradicted the key or the screenshots, though 2 could not be checked without opening the file, and the judge did not open it. One of the 14 is a contrast failure the answer key itself missed.
 
 Then a fourth agent ran `figma-preflight`, fixed the screen and read back every property it changed. Both checks ran again, and neither passes yet:
 
@@ -132,7 +132,7 @@ for me.
 Figma's own skills help an agent create things in Figma. The skills here check the agent's work before and after each write, and again at handoff. Use both. [landscape.md](docs/landscape.md#how-figma-maxxing-composes-with-figmas-skills) maps the servers and skill sets around Figma, with dates.
 
 - **figma-console bridge:** all 8 skills, in my own production work.
-- **Official Figma MCP:** `figma-preflight`, `figma-slop-check` and `figma-handoff-gate` ran there once, on the demo file of the blind test above, with some steps adapted or skipped ([the list](docs/works-with.md#blind-demo-on-the-official-figma-mcp)). That run used the earlier rigor lens of `figma-slop-check`; 1.2.0 rewrote it as 11 rigor checks in 5 groups. `figma-orient`, `figma-comment-fix-loop` and `figma-click-flow` describe that path and have not run on it yet. `figma-bridge-doctor` does not apply.
+- **Official Figma MCP:** `figma-preflight`, `figma-slop-check` and `figma-handoff-gate` ran there once, on the demo file of the test above, with some steps adapted or skipped ([the list](docs/works-with.md#blind-demo-on-the-official-figma-mcp)). That run used the earlier rigor lens of `figma-slop-check`; 1.2.0 rewrote it as 11 rigor checks in 5 groups. `figma-orient`, `figma-comment-fix-loop` and `figma-click-flow` describe that path and have not run on it yet. `figma-bridge-doctor` does not apply.
 
 Skill by skill: [works-with.md](docs/works-with.md).
 
@@ -292,7 +292,7 @@ By default it only warns. With `FIGMA_PRECHECK_MODE=block` it refuses the 5 patt
 The skills are instructions your agent reads. They do not enforce permissions or block writes on their own.
 
 - **Read-only.** `figma-canon`, `figma-preflight` and `figma-orient` instruct the agent to leave the canvas unchanged. `figma-orient` saves its map in your project, not in the Figma file.
-- **Report first.** `figma-slop-check` and `figma-handoff-gate` tell the agent to report findings and wait for approval before applying each fix.
+- **Report first.** `figma-slop-check` and `figma-handoff-gate` tell the agent to report findings and wait for approval before applying each fix. The exception is a slop failure on work the agent just made: `figma-slop-check` tells it to fix that before it answers.
 - **Comments are data.** `figma-comment-fix-loop` tells the agent to show the comments it will act on and wait for your yes. It treats instructions written in comments as data.
 - **Draft first.** `figma-canon` tells the agent to work in a draft or a branch until you approve, unless you say otherwise. It is an instruction, not a check: nothing blocks a write to a shared library, so tell the agent which draft to use.
 - **One file, several agents.** Before a write, `figma-preflight` tells the agent to claim an advisory file lock. It coordinates only sessions that check the lock; Figma does not enforce it.
@@ -328,7 +328,7 @@ This repository has an entry in the [M8ven Trust Index](https://m8ven.ai/mcp/thi
 As of 2026-10-05:
 
 - **My own work.** I built these skills in Claude Code on macOS with figma-console-mcp, on real files. This public edition is a rewrite of that set: in English, generalized, with every client detail removed. It has not yet run end to end on a second machine.
-- **Official Figma MCP.** The blind test above, on one demo screen. The audit took 12 Figma MCP calls, the fix pass 13, the second audit 13. Some steps had no tool or hit a limit there: no selection, no screenshot above 1x through `get_screenshot`, no bridge status, and a 20 KB cap on each call. The agents used read-only `use_figma` workarounds and logged each one in [works-with.md](docs/works-with.md#blind-demo-on-the-official-figma-mcp).
+- **Official Figma MCP.** The test above, on one demo screen. The audit took 12 Figma MCP calls, the fix pass 13, the second audit 13. Some steps had no tool or hit a limit there: no selection, no screenshot above 1x through `get_screenshot`, no bridge status, and a 20 KB cap on each call. The agents used read-only `use_figma` workarounds and logged each one in [works-with.md](docs/works-with.md#blind-demo-on-the-official-figma-mcp).
 - **Installs.** Every route in [Install for your agent](#install-for-your-agent) except Cursor, from GitHub main, the v1.1.1 release or a local copy, as listed there.
 
 If something still depends on my setup, [open an issue](https://github.com/thiagoxikota/figma-maxxing/issues) with your environment and the exact error.

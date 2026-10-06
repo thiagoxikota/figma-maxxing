@@ -38,7 +38,7 @@ Você precisa de um agente de código que carregue skills e do Node.js para roda
 
 **Teste no servidor MCP oficial da Figma, 05/10/2026: a auditoria achou os 10 defeitos plantados, nenhum ficou de fora.** Quem plantou os defeitos tinha lido as skills, o prompt do auditor dizia onde olhar, e foi uma tela em uma rodada.
 
-Um agente montou uma tela de demonstração com 10 defeitos plantados e um gabarito. Outro, sem o gabarito, rodou o `figma-slop-check` e o `figma-handoff-gate`. Um terceiro comparou a auditoria com o gabarito. A auditoria também apontou 14 itens fora do gabarito (13 problemas diferentes: ambas pediram a mesma renomeação). Depois de uma passada de correção, o `figma-slop-check` caiu de 16 achados para 6, mas nenhuma das checagens passou. Também tem uma [animação de 9 segundos](../assets/demo/demo.gif).
+Um agente montou uma tela de demonstração com 10 defeitos plantados e um gabarito. Outro, sem o gabarito, rodou o `figma-slop-check` e o `figma-handoff-gate`. Um terceiro comparou a auditoria com o gabarito. A auditoria também apontou 14 itens fora do gabarito (13 problemas diferentes: os dois gates pediram a mesma renomeação). Depois de uma passada de correção, o `figma-slop-check` caiu de 16 achados para 6, mas nenhum dos dois gates passou. Também tem uma [animação de 9 segundos](../assets/demo/demo.gif).
 
 <details>
 <summary>Os marcadores, como o teste rodou e os limites dele</summary>
@@ -54,9 +54,9 @@ Os marcadores apontam para os 8 primeiros itens da lista do `figma-slop-check`, 
 7. **ÍCONE:** ícone de pessoa desenhado à mão no lugar do Icon/User
 8. **RAIO:** raio do card de resumo fora da escala
 
-O teste usou uma tela de demonstração com 10 defeitos plantados e um gabarito. O agente que montou a tela tinha lido as skills. Outro agente, que nunca viu o gabarito, rodou o `figma-slop-check` e o `figma-handoff-gate` pelo servidor MCP oficial da Figma. O prompt dele dizia o que inspecionar: variáveis vinculadas, instâncias e frames, espaçamento, raio, nomes e limites de texto. Um terceiro agente comparou a lista de problemas com o gabarito.
+O teste usou uma tela de demonstração com 10 defeitos plantados e um gabarito. O agente que montou a tela tinha lido as skills. Outro agente, que nunca viu o gabarito, rodou o `figma-slop-check` e o `figma-handoff-gate` pelo servidor MCP oficial da Figma. O prompt dele dizia o que inspecionar: variáveis vinculadas, instâncias e frames, espaçamento, raio, nomes e limites de texto. Um terceiro agente, o juiz, comparou a lista de problemas com o gabarito.
 
-**A auditoria achou os 10 defeitos plantados, nenhum pela metade, e nenhum passou batido.** Quem plantou os defeitos tinha lido as skills, o prompt do auditor dizia onde olhar, e foi uma tela em uma rodada. A lista tinha 27 itens: 16 do `figma-slop-check` e 11 do `figma-handoff-gate`. Desses, 13 batem com algum defeito plantado (alguns defeitos aparecem em mais de um item). Os outros 14 itens apontam problemas fora do gabarito: são 13 diferentes, porque ambas pediram a mesma renomeação. Nenhum é desmentido pelo gabarito nem pelas capturas, mas 2 só poderiam ser conferidos abrindo o arquivo, e o juiz não abriu. Um deles é uma falha de contraste que nem o gabarito tinha pegado.
+**A auditoria achou os 10 defeitos plantados, nenhum pela metade, e nenhum passou batido.** Quem plantou os defeitos tinha lido as skills, o prompt do auditor dizia onde olhar, e foi uma tela em uma rodada. A lista tinha 27 itens: 16 do `figma-slop-check` e 11 do `figma-handoff-gate`. Desses, 13 batem com algum defeito plantado (alguns defeitos aparecem em mais de um item). Os outros 14 itens apontam problemas fora do gabarito: são 13 diferentes, porque os dois gates pediram a mesma renomeação. Nenhum é desmentido pelo gabarito nem pelas capturas, mas 2 só poderiam ser conferidos abrindo o arquivo, e o juiz não abriu. Um dos 14 é uma falha de contraste que nem o gabarito tinha pegado.
 
 Depois, um quarto agente rodou o `figma-preflight`, corrigiu a tela e releu cada propriedade que mudou. O `figma-slop-check` e o `figma-handoff-gate` rodaram de novo, e nenhum dos dois passa ainda:
 
@@ -135,7 +135,7 @@ As skills estão escritas em inglês, para servir também a quem não fala portu
 As skills da própria Figma ajudam o agente a criar no Figma. As deste repositório conferem o trabalho do agente antes e depois de cada edição, e de novo no handoff. Use os dois conjuntos. O [landscape.md](landscape.md#how-figma-maxxing-composes-with-figmas-skills), em inglês, mapeia os servidores e os conjuntos de skills em volta do Figma, com datas.
 
 - **Bridge do figma-console:** as 8 skills, no meu trabalho em produção.
-- **MCP oficial da Figma:** o `figma-preflight`, o `figma-slop-check` e o `figma-handoff-gate` rodaram lá uma vez, no arquivo de demonstração do teste às cegas acima, com alguns passos adaptados ou pulados ([a lista](works-with.md#blind-demo-on-the-official-figma-mcp), em inglês). Essa rodada usou a lente de rigor anterior do `figma-slop-check`; a 1.2.0 reescreveu essa lente em 5 grupos e 11 itens. O `figma-orient`, o `figma-comment-fix-loop` e o `figma-click-flow` descrevem esse caminho, mas ainda não rodaram nele. O `figma-bridge-doctor` não se aplica.
+- **MCP oficial da Figma:** o `figma-preflight`, o `figma-slop-check` e o `figma-handoff-gate` rodaram lá uma vez, no arquivo de demonstração do teste acima, com alguns passos adaptados ou pulados ([a lista](works-with.md#blind-demo-on-the-official-figma-mcp), em inglês). Essa rodada usou a lente de rigor anterior do `figma-slop-check`; a 1.2.0 reescreveu essa lente em 5 grupos e 11 itens. O `figma-orient`, o `figma-comment-fix-loop` e o `figma-click-flow` descrevem esse caminho, mas ainda não rodaram nele. O `figma-bridge-doctor` não se aplica.
 
 Skill por skill: [works-with.md](works-with.md).
 
@@ -292,13 +292,13 @@ Por padrão ele só avisa. Com `FIGMA_PRECHECK_MODE=block`, ele recusa os 5 padr
 
 ### Antes de usar na biblioteca do time
 
-As skills são instruções que o agente lê. Elas não impõem permissões nem bloqueiam edições por conta própria.
+As skills são instruções que o agente lê. Sozinhas, elas não controlam permissões nem bloqueiam edições.
 
 - **Só leitura.** O `figma-canon`, o `figma-preflight` e o `figma-orient` mandam o agente deixar o canvas como está. O `figma-orient` salva o mapa no seu projeto, não no arquivo do Figma.
-- **Relatório antes.** O `figma-slop-check` e o `figma-handoff-gate` mandam o agente relatar os problemas e esperar a aprovação antes de aplicar cada correção.
+- **Relatório antes.** O `figma-slop-check` e o `figma-handoff-gate` mandam o agente relatar os problemas e esperar a aprovação antes de aplicar cada correção. A exceção é uma falha de slop num trabalho que o próprio agente acabou de fazer: o `figma-slop-check` manda corrigir antes de responder.
 - **Comentário é dado.** O `figma-comment-fix-loop` manda o agente mostrar os comentários em que vai mexer e esperar o seu sim. Instruções escritas nos comentários entram como dados.
 - **Rascunho primeiro.** O `figma-canon` manda o agente trabalhar num rascunho ou numa branch até você aprovar, a menos que você diga outra coisa. É uma instrução, não uma checagem: nada impede uma edição numa biblioteca compartilhada, então diga ao agente qual rascunho usar.
-- **Um arquivo, vários agentes.** Antes de editar, o `figma-preflight` manda o agente reservar o arquivo com um lock. Ele só coordena sessões que consultam essa reserva; o Figma não impõe o lock.
+- **Um arquivo, vários agentes.** Antes de editar, o `figma-preflight` manda o agente reservar o arquivo com um lock. Esse lock só coordena as sessões que consultam a reserva; o Figma não o impõe.
 - **Nada em segundo plano.** O plugin não traz hook nem servidor MCP. O watchdog da bridge e o daemon `mcp-direct` só sobem quando você manda.
 - **Sem telemetria.** O repositório não coleta nada: [PRIVACY.md](../PRIVACY.md). Notas de segurança e relato privado de falhas: [SECURITY.md](../SECURITY.md).
 
@@ -331,14 +331,14 @@ Este repositório tem uma entrada no [M8ven Trust Index](https://m8ven.ai/mcp/th
 Em 05/10/2026:
 
 - **Meu trabalho.** Construí estas skills no Claude Code, no macOS, com o figma-console-mcp, em arquivos reais. Esta edição pública é uma reescrita daquele conjunto: em inglês, generalizada e sem nenhum detalhe de cliente. Ainda não rodou de ponta a ponta numa segunda máquina.
-- **MCP oficial da Figma.** O teste às cegas lá de cima, numa tela de demonstração. A auditoria usou 12 chamadas ao MCP da Figma, a correção usou 13 e a segunda auditoria, mais 13. Alguns passos não tinham ferramenta lá ou esbarraram em limite: não há seleção, o `get_screenshot` não captura acima de 1x, não há status da bridge e cada chamada tem limite de 20 KB. Os agentes contornaram esses limites usando o `use_figma` só para ler, sem editar nada, e registraram cada contorno no [works-with.md](works-with.md#blind-demo-on-the-official-figma-mcp).
+- **MCP oficial da Figma.** O teste lá de cima, numa tela de demonstração. A auditoria usou 12 chamadas ao MCP da Figma, a correção usou 13 e a segunda auditoria, mais 13. Alguns passos não tinham ferramenta lá ou esbarraram em limite: não há seleção, o `get_screenshot` não captura acima de 1x, não há status da bridge e cada chamada tem limite de 20 KB. Os agentes contornaram esses limites usando o `use_figma` só para ler, sem editar nada, e registraram cada contorno no [works-with.md](works-with.md#blind-demo-on-the-official-figma-mcp).
 - **Instalações.** Todas as rotas de [Instalar no seu agente](#instalar-no-seu-agente), menos o Cursor, a partir da main do GitHub, da release v1.1.1 ou de uma cópia local, como está descrito lá.
 
 Se alguma coisa ainda depender do meu ambiente, [abra uma issue](https://github.com/thiagoxikota/figma-maxxing/issues) com o seu ambiente e o erro exato.
 
 ## Contribuir
 
-Um gotcha que você encontrou de verdade, com o sintoma, a causa e a correção que rodou, cabe aqui. Dúvidas e prints de antes e depois vão para as [Discussions](https://github.com/thiagoxikota/figma-maxxing/discussions); bugs e gotchas, para as [issues](https://github.com/thiagoxikota/figma-maxxing/issues/new/choose). Veja o [CONTRIBUTING.md](../CONTRIBUTING.md), o [código de conduta](../CODE_OF_CONDUCT.md) e o [changelog](../CHANGELOG.md). Vai contribuir com um agente? Peça para ele ler o [AGENTS.md](../AGENTS.md).
+Um gotcha que você encontrou de verdade, com o sintoma, a causa e a correção que você aplicou, cabe aqui. Dúvidas e prints de antes e depois vão para as [Discussions](https://github.com/thiagoxikota/figma-maxxing/discussions); bugs e gotchas, para as [issues](https://github.com/thiagoxikota/figma-maxxing/issues/new/choose). Veja o [CONTRIBUTING.md](../CONTRIBUTING.md), o [código de conduta](../CODE_OF_CONDUCT.md) e o [changelog](../CHANGELOG.md). Vai contribuir com um agente? Peça para ele ler o [AGENTS.md](../AGENTS.md).
 
 ## Quem fez
 
