@@ -317,7 +317,7 @@ gh attestation verify figma-preflight-1.1.1.zip \
 
 This repository has an entry in the [M8ven Trust Index](https://m8ven.ai/mcp/thiagoxikota/figma-maxxing), claimed by the author himself. Its public grade is C (Emerging). The code sub-score was 100 out of 100, read on 2026-10-04 at commit 1dca321, before 1.1.0.
 
-[![M8ven Score](https://m8ven.ai/badge/mcp/thiagoxikota/figma-maxxing)](https://m8ven.ai/mcp/thiagoxikota/figma-maxxing?s=readme)
+[![M8ven Score](https://m8ven.ai/badge/mcp/thiagoxikota-figma-maxxing-1lm8zs?v=4cd8b7012dc0756bb5aa91e8c02089c4)](https://m8ven.ai/mcp/thiagoxikota-figma-maxxing-1lm8zs?s=readme)
 
 ## How far this has been tested
 
