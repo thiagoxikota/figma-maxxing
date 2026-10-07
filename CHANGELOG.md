@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Fixed
+
+- PRIVACY.md, SECURITY.md and llms.txt: name the one shipped script that reaches `api.figma.com` and the skill steps that call Figma, Apple and npm directly. PRIVACY.md also lists the comments file, the review package and the screenshots the skills save.
+
 ### Changed
 
 - Both READMEs: move installation navigation into the opening, qualify the audit instructions and keep the demo test limits beside each result. Remove requests for stars.
