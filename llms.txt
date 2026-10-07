@@ -84,7 +84,7 @@ Signs that a screen was made by AI without a design system:
 - The gotchas come from production work, and a new one is accepted only with a symptom, a cause (or "not established"), the fix that ran and the month it was seen. The page "Why does my agent...?" (`docs/gotchas.md`) indexes them by symptom, in a designer's words.
 - `scripts/check_api.py` checks every Plugin API name the skills mention (`figma.*` chains, member names, enum values) against `@figma/plugin-typings` 1.140.0, so an invented or misspelled method fails the check before it ships. Names cited because they do not exist, such as `getAnnotations()`, are listed on purpose and must stay absent.
 - Unit tests check skill frontmatter, links between files, the file lock, the hook, the installer, and style and privacy patterns. CI runs them on macOS and Ubuntu.
-- Nothing in this project collects data or sends telemetry. The skills, the hook, the installer and the bridge scripts connect only to 127.0.0.1; the skill steps that read comments call the Figma API with the designer's own token. The one exception is the maintainer script `scripts/check_api.py`, which downloads the pinned typings from registry.npmjs.org.
+- Nothing in this project collects data or sends telemetry. Of the plugin's scripts, only `fetch_comments.py` reaches the internet, to read comments from api.figma.com with the designer's own token; the hook, the installer and the other scripts connect only to 127.0.0.1 or not at all. Some skill steps have the agent call the Figma API, Apple's App Store search or the npm registry directly. The maintainer script `scripts/check_api.py`, which is not part of the plugin, downloads the pinned typings from registry.npmjs.org.
 
 ## Which skills fit which setup
 
