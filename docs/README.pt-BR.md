@@ -342,7 +342,7 @@ Um gotcha que você encontrou de verdade, com o sintoma, a causa e a correção 
 
 ## Quem fez
 
-Sou o Thiago Xikota, AI Product Designer, fundador da Xikota Design e pesquisador no Lemme (UFSC). Estou escrevendo o *Design na era da IA* (Casa do Código, em produção). [Me siga no LinkedIn](https://www.linkedin.com/in/thiagoxikota).
+Sou o Thiago Xikota, Forward Deployed Product Designer especializado em inteligência artificial, fundador da Xikota Design e pesquisador no Lemme (UFSC). Estou escrevendo o *Design na era da IA* (Casa do Código, em produção). [Me siga no LinkedIn](https://www.linkedin.com/in/thiagoxikota).
 
 ## Créditos
 
