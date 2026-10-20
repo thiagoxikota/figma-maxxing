@@ -10,7 +10,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
-- Author bios in both READMEs: Thiago's current title is Forward Deployed Product Designer, specializing in artificial intelligence.
+- Author bios in both READMEs and llms.txt: Thiago's current title is Forward Deployed Product Designer, specializing in artificial intelligence.
 - Both READMEs: move installation navigation into the opening, qualify the audit instructions and keep the demo test limits beside each result. Remove requests for stars.
 - Social preview: paper background, red accent and larger text, with an unmodified crop of the real demo screenshot and an embedded licensed font.
 
