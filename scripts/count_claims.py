@@ -5,9 +5,9 @@ Stdlib only. The counts come from the files themselves:
   skills             skills/*/SKILL.md
   gotchas            '## ' headings in plugin-api-anomalies.md and field-notes.md, minus the two
                      headings that are not gotchas ('Research vs ...', 'Anti-patterns ...')
-  handoff_checks     '### <n>.' headings in figma-handoff-gate/SKILL.md
-  preflight_checks   '### Check <n>:' headings in figma-preflight/SKILL.md
-  slop_checks        '### S<n>.' headings in figma-slop-check/SKILL.md
+  handoff_checks     '### <n>.' headings in figma-handoff-gate (SKILL.md and references/*.md)
+  preflight_checks   '### Check <n>:' headings in figma-preflight (SKILL.md and references/*.md)
+  slop_checks        '### S<n>.' headings in figma-slop-check (SKILL.md and references/*.md)
   hook_patterns      entries in PATTERNS in hooks/figma-canon-precheck.py (and how many BLOCK)
 
 Claims are checked in README.md, docs/*.md (except docs about other projects), llms.txt,
@@ -54,6 +54,12 @@ def headings(path: Path, pattern: str) -> list[str]:
     return [line for line in path.read_text().split('\n') if re.match(pattern, line)]
 
 
+def skill_headings(skill: Path, pattern: str) -> int:
+    """Headings in a skill's SKILL.md plus its references/*.md, where the checks now live."""
+    files = [skill / 'SKILL.md', *sorted((skill / 'references').glob('*.md'))]
+    return sum(len(headings(f, pattern)) for f in files if f.is_file())
+
+
 def counts(root: Path = ROOT) -> dict:
     skills = root / 'skills'
     refs = skills / 'figma-canon/references'
@@ -68,9 +74,9 @@ def counts(root: Path = ROOT) -> dict:
         'gotchas': sum(per_file.values()),
         'gotchas_anomalies': per_file['plugin-api-anomalies.md'],
         'gotchas_field_notes': per_file['field-notes.md'],
-        'handoff_checks': len(headings(skills / 'figma-handoff-gate/SKILL.md', r'### \d+\. ')),
-        'preflight_checks': len(headings(skills / 'figma-preflight/SKILL.md', r'### Check \d+: ')),
-        'slop_checks': len(headings(skills / 'figma-slop-check/SKILL.md', r'### S\d+\. ')),
+        'handoff_checks': skill_headings(skills / 'figma-handoff-gate', r'### \d+\. '),
+        'preflight_checks': skill_headings(skills / 'figma-preflight', r'### Check \d+: '),
+        'slop_checks': skill_headings(skills / 'figma-slop-check', r'### S\d+\. '),
         'hook_patterns': len(patterns),
         'hook_block_patterns': patterns.count('BLOCK'),
     }
